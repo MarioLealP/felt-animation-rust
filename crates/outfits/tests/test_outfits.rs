@@ -5,9 +5,6 @@
 //! (`routers/debug.py`, another module) over HTTP; see the order report.
 
 use std::collections::BTreeMap;
-
-/// One way to mutate the shared test context.
-type Mutation = Box<dyn Fn(&Ctx)>;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use std::thread;
@@ -22,9 +19,6 @@ use felt_outfits::state::{
 };
 use felt_outfits::wardrobe::{FileWardrobe, WardrobeStore};
 use felt_outfits::{
-
-/// One way to mutate the shared test context.
-type Mutation = Box<dyn Fn(&Ctx)>;
     Date, DateTime, OutfitDirector, OutfitRng, PyRandom, ambient_pick, bikini_roll, effective_date,
     load_outfits, pool_ids, scheduled_outfit,
 };
@@ -419,7 +413,7 @@ fn test_bikini_reply_triggers_quick_change() {
 #[test]
 fn test_defer_while_seated_hidden_speaking() {
     let dir = tmp_dir("defer");
-    let mutations: Vec<Mutation> = vec![
+    let mutations: Vec<Box<dyn Fn(&Ctx)>> = vec![
         Box::new(|ctx| *ctx.ledge.lock().unwrap() = Some("w1".to_string())),
         Box::new(|ctx| *ctx.props.seated.lock().unwrap() = Some("chair".to_string())),
         Box::new(|ctx| *ctx.behavior.posture.lock().unwrap() = "sitting".to_string()),
