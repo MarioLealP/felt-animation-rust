@@ -19,6 +19,7 @@
 //!     so two sequences can't deadlock), which is exactly the old single lock:
 //!     a full-body clip still waits for, and never cuts off, a gesture;
 //!   - walk_to takes only the base lock - a walk is what a gesture rides on.
+//!
 //! The rule itself is unchanged, per layer: nothing interrupts what is already
 //! playing on the body part it needs.
 //!

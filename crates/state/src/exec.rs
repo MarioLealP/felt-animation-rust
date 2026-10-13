@@ -64,11 +64,13 @@ fn with_exec<R>(f: impl FnOnce(&mut ExecutorState) -> R) -> R {
 /// Enqueue `id` if it isn't scheduled already. Called from wakers and spawn.
 fn schedule(id: usize) {
     with_exec(|e| {
-        if let Some(slot) = e.tasks.get_mut(&id) {
-            if !slot.scheduled && !slot.done && !slot.cancelled {
-                slot.scheduled = true;
-                e.queue.push_back(id);
-            }
+        if let Some(slot) = e.tasks.get_mut(&id)
+            && !slot.scheduled
+            && !slot.done
+            && !slot.cancelled
+        {
+            slot.scheduled = true;
+            e.queue.push_back(id);
         }
     });
 }
@@ -95,10 +97,11 @@ fn waker_for(id: usize) -> Waker {
 
 fn store_future(id: usize, future: TaskFuture) {
     with_exec(|e| {
-        if let Some(slot) = e.tasks.get_mut(&id) {
-            if !slot.done && !slot.cancelled {
-                slot.future = Some(future);
-            }
+        if let Some(slot) = e.tasks.get_mut(&id)
+            && !slot.done
+            && !slot.cancelled
+        {
+            slot.future = Some(future);
         }
     });
 }
@@ -382,12 +385,17 @@ pub fn sleep_until(deadline: Instant) -> impl Future<Output = ()> {
     })
 }
 
+/// [wait_for] gave up before its future completed - the Python raises
+/// `TimeoutError`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Timeout;
+
 /// Await `fut`, giving up after `timeout` - like `asyncio.wait_for`. Resolves
-/// to `Err(())` on timeout (the Python raises `TimeoutError`).
+/// to `Err(Timeout)` on timeout.
 pub fn wait_for<F: Future>(
     fut: F,
     timeout: Duration,
-) -> impl Future<Output = Result<F::Output, ()>> {
+) -> impl Future<Output = Result<F::Output, Timeout>> {
     let mut fut = Box::pin(fut);
     let mut timer = Box::pin(sleep_until(Instant::now() + timeout));
     poll_fn(move |cx| {
@@ -395,7 +403,7 @@ pub fn wait_for<F: Future>(
             return Poll::Ready(Ok(value));
         }
         if timer.as_mut().poll(cx).is_ready() {
-            return Poll::Ready(Err(()));
+            return Poll::Ready(Err(Timeout));
         }
         Poll::Pending
     })

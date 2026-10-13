@@ -66,6 +66,9 @@ fn is_upper(overlay: &impl OverlayLike, tag: &str) -> bool {
 
 /// The locks `tags` need, held until dropped: the upper lock if every tag is
 /// upper-body, otherwise base then upper (see the module docstring).
+/// The guards are stored only so dropping this releases them (RAII) - they
+/// are never read after construction.
+#[allow(dead_code)]
 struct HeldLocks {
     base: Option<LockGuard>,
     upper: Option<LockGuard>,
