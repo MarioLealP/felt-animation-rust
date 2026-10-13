@@ -18,7 +18,7 @@ pub const LATE_NIGHT: &str = "late_night";
 pub type Mood = BTreeMap<String, f64>;
 
 pub fn time_band(hour: i32) -> &'static str {
-    if hour >= 23 || hour < 4 {
+    if !(4..23).contains(&hour) {
         LATE_NIGHT
     } else if hour < 11 {
         MORNING
