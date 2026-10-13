@@ -4,7 +4,7 @@ use std::cell::Cell;
 use std::collections::{BTreeSet, HashMap};
 use std::rc::Rc;
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use felt_accessories::{
     AccessoryDirector, AccessoryState, Clock, SeededRng, WornItem, WornSummary,
@@ -181,13 +181,14 @@ fn test_ambient_piece_expires() {
     d.clock.now.set(161.0); // clock[0] += 61
     d.tick().unwrap();
     assert!(!d.snapshot().contains_key("face"));
-    assert!(d
-        .state
-        .props
-        .log
-        .last()
-        .unwrap()
-        .starts_with("-round_glasses"));
+    assert!(
+        d.state
+            .props
+            .log
+            .last()
+            .unwrap()
+            .starts_with("-round_glasses")
+    );
 }
 
 #[test]
@@ -208,8 +209,10 @@ fn test_pick_follows_tags_and_free_slots() {
         },
     );
     assert!(d.pick(12).is_none()); // the only cute item's slot is taken
-    assert!(!(0..24)
-        .map(|h| d.pick(h))
-        .collect::<BTreeSet<Option<String>>>()
-        .contains(&Some("witch_hat".to_string()))); // outfit-only
+    assert!(
+        !(0..24)
+            .map(|h| d.pick(h))
+            .collect::<BTreeSet<Option<String>>>()
+            .contains(&Some("witch_hat".to_string()))
+    ); // outfit-only
 }

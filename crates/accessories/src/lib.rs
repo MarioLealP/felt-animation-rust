@@ -22,7 +22,7 @@
 
 use std::collections::{BTreeSet, HashMap};
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 pub const AMBIENT_EVERY_S: f64 = 180.0;
 pub const AMBIENT_CHANCE: f64 = 0.12; // per check, when a slot is free and nothing else is going on
@@ -350,20 +350,31 @@ impl<S: AccessoryState, R: Rng, C: Clock> AccessoryDirector<S, R, C> {
     pub fn pick(&mut self, hour: i32) -> Option<String> {
         let tags = context_tags(hour, self.state.mood(), self.state.weather_condition());
         let accessories = self.state.manifest().get("accessories");
-        let item_tags = accessories.and_then(|a| a.get("tags")).and_then(Value::as_object);
-        let slots = accessories.and_then(|a| a.get("slots")).and_then(Value::as_object);
+        let item_tags = accessories
+            .and_then(|a| a.get("tags"))
+            .and_then(Value::as_object);
+        let slots = accessories
+            .and_then(|a| a.get("slots"))
+            .and_then(Value::as_object);
         let mut options: Vec<String> = Vec::new();
         if let Some(slots) = slots {
             for (slot, items) in slots {
                 if self.worn.contains_key(slot.as_str()) {
                     continue;
                 }
-                for item in items.as_array().into_iter().flatten().filter_map(Value::as_str) {
+                for item in items
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .filter_map(Value::as_str)
+                {
                     let tagged = item_tags
                         .and_then(|t| t.get(item))
                         .and_then(Value::as_array)
                         .is_some_and(|list| {
-                            list.iter().filter_map(Value::as_str).any(|t| tags.contains(t))
+                            list.iter()
+                                .filter_map(Value::as_str)
+                                .any(|t| tags.contains(t))
                         });
                     if tagged {
                         options.push(item.to_string());
