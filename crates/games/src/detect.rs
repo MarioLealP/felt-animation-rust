@@ -2,7 +2,7 @@
 
 use std::collections::{HashMap, HashSet};
 
-use crate::classify::{classify_process, GameSources};
+use crate::classify::{GameSources, classify_process};
 use crate::paths::norm_path;
 use crate::title::clean_title;
 
@@ -109,13 +109,17 @@ impl<F: Fn() -> f64> GameTracker<F> {
 
     /// Feed one poll's {key: display name}. Returns (started_names,
     /// [(stopped_name, duration_s), ...]), sorted for determinism.
-    pub fn update(&mut self, current: &HashMap<String, String>) -> (Vec<String>, Vec<(String, f64)>) {
+    pub fn update(
+        &mut self,
+        current: &HashMap<String, String>,
+    ) -> (Vec<String>, Vec<(String, f64)>) {
         let now = (self.now_fn)();
         let previous = self.running_keys();
         let current_keys: HashSet<String> = current.keys().cloned().collect();
         let (started, stopped) = diff_running_games(&previous, &current_keys);
         for key in &started {
-            self.running.insert(key.clone(), (now, current[key].clone()));
+            self.running
+                .insert(key.clone(), (now, current[key].clone()));
         }
         let mut stopped_with_duration = Vec::new();
         for key in &stopped {

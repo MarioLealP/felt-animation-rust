@@ -7,7 +7,7 @@ use std::path::{Path, PathBuf};
 
 use crate::classify::GameSources;
 use crate::config::{build_sources, load_games_config};
-use crate::detect::{detect_games, ProcSample};
+use crate::detect::{ProcSample, detect_games};
 use crate::paths::norm_path;
 
 /// One process's window observation: its best visible top-level window.
@@ -97,12 +97,7 @@ impl<N: Fn() -> f64, D: FnMut(&Path) -> GameSources> GameDetector<N, D> {
         Self::with_games_path(crate::default_games_path(), refresh_s, now_fn, discover_fn)
     }
 
-    pub fn with_games_path(
-        games_path: PathBuf,
-        refresh_s: f64,
-        now_fn: N,
-        discover_fn: D,
-    ) -> Self {
+    pub fn with_games_path(games_path: PathBuf, refresh_s: f64, now_fn: N, discover_fn: D) -> Self {
         Self {
             games_path,
             refresh_s,

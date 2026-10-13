@@ -165,7 +165,10 @@ impl Default for GameSources {
             roots: Vec::new(),
             known_exes: HashSet::new(),
             manual_names: HashSet::new(),
-            ignore_names: DEFAULT_IGNORE_NAMES.iter().map(|s| (*s).to_string()).collect(),
+            ignore_names: DEFAULT_IGNORE_NAMES
+                .iter()
+                .map(|s| (*s).to_string())
+                .collect(),
             ignore_patterns: DEFAULT_IGNORE_PATTERNS
                 .iter()
                 .map(|s| (*s).to_string())
@@ -225,11 +228,7 @@ pub fn classify_process(
     }
     let key = exe_path.map(norm_path);
     if let Some(key) = &key {
-        if sources
-            .exclude_roots
-            .iter()
-            .any(|root| is_under(key, root))
-        {
+        if sources.exclude_roots.iter().any(|root| is_under(key, root)) {
             return false;
         }
     }
@@ -243,6 +242,5 @@ pub fn classify_process(
     if is_ignored_exe(&name, sources) {
         return false;
     }
-    sources.known_exes.contains(&key)
-        || sources.roots.iter().any(|root| is_under(&key, root))
+    sources.known_exes.contains(&key) || sources.roots.iter().any(|root| is_under(&key, root))
 }

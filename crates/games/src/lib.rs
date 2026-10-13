@@ -38,16 +38,16 @@ pub mod title;
 use std::path::PathBuf;
 
 pub use classify::{
-    classify_process, is_ignored_exe, GameSources, DEFAULT_IGNORE_NAMES, DEFAULT_IGNORE_PATTERNS,
-    NEVER_GAMES,
+    DEFAULT_IGNORE_NAMES, DEFAULT_IGNORE_PATTERNS, GameSources, NEVER_GAMES, classify_process,
+    is_ignored_exe,
 };
 pub use config::{
-    build_sources, load_games, load_games_config, parse_libraryfolders_vdf, GamesConfig,
+    GamesConfig, build_sources, load_games, load_games_config, parse_libraryfolders_vdf,
 };
-pub use detect::{detect_games, diff_running_games, GameTracker, ProcSample};
+pub use detect::{GameTracker, ProcSample, detect_games, diff_running_games};
 pub use os::{
-    discover_sources, felt_root, GameDetector, GameSourceDiscovery, ProcessProbe, ProcInfo,
-    WindowSample,
+    GameDetector, GameSourceDiscovery, ProcInfo, ProcessProbe, WindowSample, discover_sources,
+    felt_root,
 };
 pub use paths::{exe_name_of, fnmatch_case, is_under, norm_path};
 pub use title::clean_title;

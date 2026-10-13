@@ -6,9 +6,8 @@ use regex::Regex;
 
 use crate::paths::{ntpath_basename, ntpath_splitext};
 
-static STORE_SUFFIX: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"(?i)\s*[-–—|]\s*(steam|epic games|gog galaxy)\s*$").unwrap()
-});
+static STORE_SUFFIX: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?i)\s*[-–—|]\s*(steam|epic games|gog galaxy)\s*$").unwrap());
 static BRACKET_SUFFIX: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"\s*[\(\[]([^\(\)\[\]]*)[\)\]]\s*$").unwrap());
 static BRACKET_JUNK: LazyLock<Regex> = LazyLock::new(|| {
@@ -23,8 +22,7 @@ static VERSION_SUFFIX: LazyLock<Regex> = LazyLock::new(|| {
     )
     .unwrap()
 });
-static TRAILING_SEP: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"[\s\-–—|:]+$").unwrap());
+static TRAILING_SEP: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"[\s\-–—|:]+$").unwrap());
 static STEM_SUFFIX: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"(?i)([-_](win64|wingdk|win32))?[-_]shipping$|[-_](x64|x86|dx11|dx12|64)$").unwrap()
 });

@@ -16,7 +16,10 @@ pub fn exe_name_of(path: &str) -> String {
 /// Is `path_key` the root itself or inside it? Both args are norm_path'd.
 pub fn is_under(path_key: &str, root_key: &str) -> bool {
     let root = root_key.trim_end_matches('\\');
-    path_key == root || path_key.strip_prefix(root).is_some_and(|r| r.starts_with('\\'))
+    path_key == root
+        || path_key
+            .strip_prefix(root)
+            .is_some_and(|r| r.starts_with('\\'))
 }
 
 /// `fnmatch.fnmatchcase` - case-sensitive glob match on `*`, `?` and
@@ -78,18 +81,14 @@ pub fn fnmatch_case(name: &str, pattern: &str) -> bool {
 
 /// `ntpath.basename`: final component after the last `\` or `/`.
 pub(crate) fn ntpath_basename(path: &str) -> &str {
-    let start = path
-        .rfind(|c| c == '\\' || c == '/')
-        .map_or(0, |i| i + 1);
+    let start = path.rfind(|c| c == '\\' || c == '/').map_or(0, |i| i + 1);
     &path[start..]
 }
 
 /// `ntpath.splitext`: split the final component at its last `.`, ignoring
 /// a leading dot (hidden-file convention).
 pub(crate) fn ntpath_splitext(path: &str) -> (&str, &str) {
-    let base_start = path
-        .rfind(|c| c == '\\' || c == '/')
-        .map_or(0, |i| i + 1);
+    let base_start = path.rfind(|c| c == '\\' || c == '/').map_or(0, |i| i + 1);
     let base = &path[base_start..];
     match base.rfind('.') {
         Some(d) if d > 0 => path.split_at(base_start + d),

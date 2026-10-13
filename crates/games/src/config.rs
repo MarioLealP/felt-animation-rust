@@ -7,8 +7,8 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
-use crate::classify::{GameSources, DEFAULT_IGNORE_NAMES, DEFAULT_IGNORE_PATTERNS};
-use crate::paths::{ntpath_join, norm_path};
+use crate::classify::{DEFAULT_IGNORE_NAMES, DEFAULT_IGNORE_PATTERNS, GameSources};
+use crate::paths::{norm_path, ntpath_join};
 
 /// Manual extras from games.toml.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]

@@ -10,9 +10,9 @@ use std::rc::Rc;
 use std::sync::LazyLock;
 
 use felt_games::{
-    build_sources, classify_process, clean_title, default_games_path, detect_games,
-    diff_running_games, is_ignored_exe, load_games, load_games_config, norm_path,
-    parse_libraryfolders_vdf, GameDetector, GamesConfig, GameSources, GameTracker, ProcSample,
+    GameDetector, GameSources, GameTracker, GamesConfig, ProcSample, build_sources,
+    classify_process, clean_title, default_games_path, detect_games, diff_running_games,
+    is_ignored_exe, load_games, load_games_config, norm_path, parse_libraryfolders_vdf,
 };
 
 const STEAM: &str = r"F:\SteamLibrary\steamapps\common";
@@ -304,7 +304,10 @@ fn test_clean_title_examples() {
 
 #[test]
 fn test_clean_title_falls_back_to_exe_stem() {
-    assert_eq!(clean_title(Some(""), Some(r"F:\x\Endfield.exe")), "Endfield");
+    assert_eq!(
+        clean_title(Some(""), Some(r"F:\x\Endfield.exe")),
+        "Endfield"
+    );
     assert_eq!(clean_title(None, Some("AC2-Win64-Shipping.exe")), "AC2");
     assert_eq!(
         clean_title(Some("1.0.3"), Some(r"C:\g\factorio.exe")),
@@ -325,7 +328,13 @@ fn test_detect_games_keys_by_path_and_names_by_title() {
             true,
             Some("MONSTER HUNTER: WORLD(421810)"),
         ),
-        ProcSample::new(2, "Discord.exe", Some(r"C:\D\Discord.exe"), true, Some("Discord")),
+        ProcSample::new(
+            2,
+            "Discord.exe",
+            Some(r"C:\D\Discord.exe"),
+            true,
+            Some("Discord"),
+        ),
         ProcSample::new(
             3,
             "steam.exe",
@@ -352,7 +361,13 @@ fn test_detect_games_one_entry_per_exe_path() {
 #[test]
 fn test_detect_games_keeps_tracked_game_without_window() {
     let mhw = format!("{STEAM}\\Monster Hunter World\\MonsterHunterWorld.exe");
-    let samples = [ProcSample::new(1, "MonsterHunterWorld.exe", Some(&mhw), false, None)];
+    let samples = [ProcSample::new(
+        1,
+        "MonsterHunterWorld.exe",
+        Some(&mhw),
+        false,
+        None,
+    )];
     assert!(detect_games(&samples, &SOURCES, &HashSet::new()).is_empty());
     let key = norm_path(&mhw);
     let tracked = keys(&[key.as_str()]);
@@ -362,7 +377,13 @@ fn test_detect_games_keeps_tracked_game_without_window() {
 #[test]
 fn test_detect_games_manual_name_without_exe_path() {
     let got = detect_games(
-        &[ProcSample::new(9, "Endfield.exe", None, true, Some("Endfield"))],
+        &[ProcSample::new(
+            9,
+            "Endfield.exe",
+            None,
+            true,
+            Some("Endfield"),
+        )],
         &SOURCES,
         &HashSet::new(),
     );
@@ -397,7 +418,10 @@ fn test_tracker_start_and_stop_with_duration_and_start_name() {
     );
     assert_eq!(tracker.running_names(), ["Game A"]);
     clock.set(clock.get() + 90.0);
-    assert_eq!(tracker.update(&HashMap::new()), events(&[], &[("Game A", 90.0)]));
+    assert_eq!(
+        tracker.update(&HashMap::new()),
+        events(&[], &[("Game A", 90.0)])
+    );
 }
 
 #[test]
@@ -424,9 +448,15 @@ fn test_tracker_handles_two_games_independently() {
     let mut tracker = GameTracker::new(|| clock.get());
     tracker.update(&map(&[("a", "A")]));
     clock.set(10.0);
-    assert_eq!(tracker.update(&map(&[("a", "A"), ("b", "B")])), events(&["B"], &[]));
+    assert_eq!(
+        tracker.update(&map(&[("a", "A"), ("b", "B")])),
+        events(&["B"], &[])
+    );
     clock.set(40.0);
-    assert_eq!(tracker.update(&map(&[("b", "B")])), events(&[], &[("A", 40.0)]));
+    assert_eq!(
+        tracker.update(&map(&[("b", "B")])),
+        events(&[], &[("A", 40.0)])
+    );
     assert_eq!(tracker.running_keys(), keys(&["b"]));
 }
 
