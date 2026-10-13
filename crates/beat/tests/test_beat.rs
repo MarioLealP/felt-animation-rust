@@ -8,8 +8,8 @@ use std::f64::consts::PI;
 use std::rc::Rc;
 
 use felt_beat::{
-    beat_phase, estimate_tempo, estimate_tempo_from_audio, inter_onset_intervals, pick_onsets,
-    rms_windows, rms_windows_with, TempoLock, BPM_TOLERANCE, LOCK_HOLD_S,
+    BPM_TOLERANCE, LOCK_HOLD_S, TempoLock, beat_phase, estimate_tempo, estimate_tempo_from_audio,
+    inter_onset_intervals, pick_onsets, rms_windows, rms_windows_with,
 };
 
 /// Deterministic xorshift64* stand-in for `np.random.default_rng` (the
@@ -135,7 +135,9 @@ fn drum_pattern(bpm: f64, duration_s: f64, sr: u32, seed: u64) -> Vec<f64> {
     }
     let max_abs = x.iter().fold(0.0f64, |m, &v| m.max(v.abs()));
     // (x / np.max(np.abs(x))).astype(np.float32)
-    x.into_iter().map(|v| ((v / max_abs) as f32) as f64).collect()
+    x.into_iter()
+        .map(|v| ((v / max_abs) as f32) as f64)
+        .collect()
 }
 
 /// `lambda: box[0]` - a clock reading from a mutable box.
@@ -179,10 +181,7 @@ fn test_inter_onset_intervals_basic() {
 
 #[test]
 fn test_inter_onset_intervals_ignores_non_increasing() {
-    assert_eq!(
-        inter_onset_intervals(&[0.0, 0.5, 0.3, 1.0]),
-        vec![0.5, 0.7]
-    );
+    assert_eq!(inter_onset_intervals(&[0.0, 0.5, 0.3, 1.0]), vec![0.5, 0.7]);
 }
 
 // -- estimate_tempo -------------------------------------------------------
@@ -344,11 +343,14 @@ fn test_music_stopping_unlocks_within_a_few_seconds() {
 #[test]
 fn test_scattered_estimates_never_lock() {
     let mut lock = TempoLock::new();
-    let bpms = [70.0, 140.0, 95.0, 180.0, 110.0, 64.0, 150.0, 88.0, 123.0, 77.0];
-    assert!(bpms
-        .iter()
-        .enumerate()
-        .all(|(t, &b)| !lock.update(Some((b, 0.9)), Some(t as f64))));
+    let bpms = [
+        70.0, 140.0, 95.0, 180.0, 110.0, 64.0, 150.0, 88.0, 123.0, 77.0,
+    ];
+    assert!(
+        bpms.iter()
+            .enumerate()
+            .all(|(t, &b)| !lock.update(Some((b, 0.9)), Some(t as f64)))
+    );
 }
 
 #[test]
