@@ -5,6 +5,9 @@
 //! (`routers/debug.py`, another module) over HTTP; see the order report.
 
 use std::collections::BTreeMap;
+
+/// One way to mutate the shared test context.
+type Mutation = Box<dyn Fn(&Ctx)>;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use std::thread;
