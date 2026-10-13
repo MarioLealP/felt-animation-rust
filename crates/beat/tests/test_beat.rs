@@ -125,7 +125,7 @@ fn drum_pattern(bpm: f64, duration_s: f64, sr: u32, seed: u64) -> Vec<f64> {
     while k as f64 * beat / 2.0 < duration_s {
         let at = k as f64 * beat / 2.0;
         hit(&mut x, sr, at, 0.05, &noise, 0.3); // hat
-        if k % 2 == 0 {
+        if k.is_multiple_of(2) {
             hit(&mut x, sr, at, 0.15, &kick, 1.0);
             if (k / 2) % 2 == 1 {
                 hit(&mut x, sr, at, 0.2, &noise, 0.8); // snare
