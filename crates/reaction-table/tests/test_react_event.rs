@@ -25,7 +25,13 @@ fn test_the_contract_events_speak_and_others_do_not() {
     let path =
         PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../ref/felt-animation/reactions.json");
     let table = load_reactions(&path);
-    for event in ["game_start", "game_stop", "afk_end", "gpu_hot", "call_join_guess"] {
+    for event in [
+        "game_start",
+        "game_stop",
+        "afk_end",
+        "gpu_hot",
+        "call_join_guess",
+    ] {
         // Indexing panics when the event is missing, like Python's KeyError.
         assert!(
             table[event].iter().all(|row| py_truthy(row.get("speak"))),

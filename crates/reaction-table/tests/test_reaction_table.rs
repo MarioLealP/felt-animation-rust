@@ -5,9 +5,9 @@
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-use felt_reaction_table::{entry_key, load_reactions, pick_reaction, Entry, RandomLike};
-use rand::{rngs::StdRng, SeedableRng};
-use serde_json::{json, Value};
+use felt_reaction_table::{Entry, RandomLike, entry_key, load_reactions, pick_reaction};
+use rand::{SeedableRng, rngs::StdRng};
+use serde_json::{Value, json};
 
 /// pick_reaction() narrowed to non-None for these tests, where `entries`
 /// is always non-empty so a None pick can't actually happen - avoids
@@ -132,7 +132,12 @@ fn test_all_zero_weight_still_returns_something() {
         json!({"pose": "a", "weight": 0}),
         json!({"pose": "b", "weight": 0}),
     ];
-    let picked = must_pick(&zero_weighted, &neutral_mood(), None, &mut StdRng::seed_from_u64(0));
+    let picked = must_pick(
+        &zero_weighted,
+        &neutral_mood(),
+        None,
+        &mut StdRng::seed_from_u64(0),
+    );
     assert!(matches!(picked["pose"].as_str(), Some("a" | "b")));
 }
 
@@ -208,7 +213,12 @@ fn test_spec_fields_pass_through_untouched() {
         "speak": true,
         "weight": 1
     })];
-    let picked = must_pick(&entries, &neutral_mood(), None, &mut StdRng::seed_from_u64(0));
+    let picked = must_pick(
+        &entries,
+        &neutral_mood(),
+        None,
+        &mut StdRng::seed_from_u64(0),
+    );
     assert!(
         picked["tag"].as_str() == Some("gesture/fan")
             && picked["prop"].as_str() == Some("fan")

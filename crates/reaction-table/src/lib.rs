@@ -25,7 +25,7 @@
 use std::collections::HashMap;
 use std::path::Path;
 
-use rand::{rngs::StdRng, Rng};
+use rand::{Rng, rngs::StdRng};
 use serde_json::Value;
 
 /// One reaction-table row: the raw parsed JSON of one entry (always an
