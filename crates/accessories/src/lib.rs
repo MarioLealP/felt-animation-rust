@@ -12,6 +12,7 @@
 //!     (set after every {"outfit_applied"}); always wins its slot;
 //!   - ambient: every AMBIENT_EVERY_S, maybe one more in a free slot, picked by
 //!     mood / weather / hour from each item's tags; worn 20-90 min.
+//!
 //! A restarted overlay forgets held props, so on reconnect everything is
 //! cleared and the outfit's set comes back with the outfit (on_connected).
 //!
@@ -161,7 +162,7 @@ pub fn context_tags(
     if matches!(weather, Some("sun" | "clear")) && (9..19).contains(&hour) {
         tags.insert("summer".to_string());
     }
-    if hour >= 18 || hour < 2 {
+    if !(2..18).contains(&hour) {
         tags.insert("evening".to_string());
     }
     tags
