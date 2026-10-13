@@ -76,7 +76,10 @@ impl<F: FnMut() -> f64> MashDetector<F> {
         if now - high_since < self.sustain_s {
             return false;
         }
-        if self.last_fired_at.is_some_and(|last| now - last < self.cooldown_s) {
+        if self
+            .last_fired_at
+            .is_some_and(|last| now - last < self.cooldown_s)
+        {
             return false;
         }
         self.last_fired_at = Some(now);
@@ -88,7 +91,12 @@ impl MashDetector<fn() -> f64> {
     /// All of the Python constructor's defaults: the WP's threshold/sustain,
     /// the reaction cooldown, and a monotonic clock (`time.monotonic`).
     pub fn with_defaults() -> Self {
-        Self::new(MASH_RATE_THRESHOLD, MASH_SUSTAIN_S, MASH_COOLDOWN_S, monotonic_secs)
+        Self::new(
+            MASH_RATE_THRESHOLD,
+            MASH_SUSTAIN_S,
+            MASH_COOLDOWN_S,
+            monotonic_secs,
+        )
     }
 }
 
@@ -152,7 +160,9 @@ impl EventCounter {
     /// here; that OS wiring is out of scope for this crate, so the listener
     /// is injected instead.
     pub fn start(&mut self, mut listener: Box<dyn GlobalMouseListener>) {
-        listener.start(Box::new(CountingSink { count: Arc::clone(&self.count) }));
+        listener.start(Box::new(CountingSink {
+            count: Arc::clone(&self.count),
+        }));
         self.mouse_listener = Some(listener);
     }
 
@@ -211,5 +221,7 @@ fn record_press(count: &Mutex<u64>) {
 }
 
 fn lock(count: &Mutex<u64>) -> MutexGuard<'_, u64> {
-    count.lock().unwrap_or_else(|poisoned| poisoned.into_inner())
+    count
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner())
 }
