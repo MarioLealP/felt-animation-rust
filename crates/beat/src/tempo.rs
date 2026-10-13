@@ -146,14 +146,11 @@ pub fn onset_envelope(frames: &[f64], samplerate: u32) -> (Vec<f64>, f64) {
     // Half-wave-rectified spectral flux along the frame axis.
     let mut flux = vec![0.0; n_frames - 1];
     for (i, f) in flux.iter_mut().enumerate() {
-        let mut sum = 0.0;
-        for b in 0..keep.len() {
-            let d = log_mag[i + 1][b] - log_mag[i][b];
-            if d > 0.0 {
-                sum += d;
-            }
-        }
-        *f = sum;
+        *f = log_mag[i]
+            .iter()
+            .zip(&log_mag[i + 1])
+            .map(|(&prev, &next)| (next - prev).max(0.0))
+            .sum();
     }
 
     // np.convolve(flux, ones(k)/k, mode="same") with odd k is a zero-padded
