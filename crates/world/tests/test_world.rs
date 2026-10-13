@@ -126,9 +126,11 @@ fn test_maximised_window_contributes_no_top_edge_platform() {
     }; // exactly the monitor
     let platforms = compute_platforms(&[maximised, fullscreen], &[MONITOR0], HER_HEIGHT_PX, &[]);
 
-    assert!(!platforms
-        .iter()
-        .any(|p| p.hwnd == Some(111) || p.hwnd == Some(222)));
+    assert!(
+        !platforms
+            .iter()
+            .any(|p| p.hwnd == Some(111) || p.hwnd == Some(222))
+    );
     assert_eq!(ids(&platforms), vec!["floor:0"]);
 }
 
