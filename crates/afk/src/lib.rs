@@ -37,7 +37,12 @@ impl<F: Fn() -> f64> AfkTracker<F> {
     /// `time.monotonic` in the Python original; both are explicit here so the
     /// tracker stays pure and deterministic under test.
     pub fn new(threshold_s: f64, now_fn: F) -> Self {
-        Self { threshold_s, now_fn, afk: false, afk_started_at: None }
+        Self {
+            threshold_s,
+            now_fn,
+            afk: false,
+            afk_started_at: None,
+        }
     }
 
     /// Feed one idle-time reading; returns the AFK event it causes, if any.
