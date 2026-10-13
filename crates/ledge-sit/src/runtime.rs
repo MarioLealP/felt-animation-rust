@@ -72,10 +72,10 @@ impl AppState {
         if msg == WorldMsg::Seated(false) && self.seated_on_ledge.borrow().is_some() {
             *self.seated_on_ledge.borrow_mut() = None;
             let task = self.ledge_sit_task.borrow_mut().take();
-            if let Some(task) = &task {
-                if !task.is_done() {
-                    task.cancel();
-                }
+            if let Some(task) = &task
+                && !task.is_done()
+            {
+                task.cancel();
             }
         }
     }

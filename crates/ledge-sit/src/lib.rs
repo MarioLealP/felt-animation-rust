@@ -62,8 +62,8 @@ pub fn sit_chance(mood: &Mood) -> f64 {
         chance += sleepy * (SLEEPY_SIT_CHANCE - BASE_SIT_CHANCE);
     }
     chance -= boredom * BORED_SIT_CHANCE_PENALTY;
-    // max(0.0, min(1.0, chance)) - same nesting order as the Python.
-    chance.min(1.0).max(0.0)
+    // max(0.0, min(1.0, chance)) - clamped to a probability.
+    chance.clamp(0.0, 1.0)
 }
 
 /// A constant-range stay (45-180s per the WP), shorter when bored.
@@ -128,10 +128,11 @@ pub async fn stand_up_from_ledge(state: &Rc<AppState>) {
         *seated = None;
     }
     let task = state.ledge_sit_task.borrow_mut().take();
-    if let Some(task) = &task {
-        if !task.is_current() && !task.is_done() {
-            task.cancel();
-        }
+    if let Some(task) = &task
+        && !task.is_current()
+        && !task.is_done()
+    {
+        task.cancel();
     }
     let _guard = state.behavior.hold_base().await;
     state.overlay.ledge_stand().await;
@@ -141,9 +142,9 @@ pub async fn stand_up_from_ledge(state: &Rc<AppState>) {
 
 /// Called once a navigation plan has landed her on `platform`. Never
 /// sits on a floor. `force = true` (the explicit Ctrl+Alt+G ledge
-/// action) always sits; otherwise a mood-weighted chance ([`sit_chance`])
-/// - "always sit when she got there via the explicit ledge action" (the
-/// WP's own wording).
+/// action) always sits; otherwise a mood-weighted chance ([`sit_chance`]) -
+/// "always sit when she got there via the explicit ledge action" (the WP's
+/// own wording).
 pub async fn maybe_sit_after_arrival(
     state: &Rc<AppState>,
     platform: &Platform,

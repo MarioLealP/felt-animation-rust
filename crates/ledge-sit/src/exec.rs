@@ -14,19 +14,12 @@ use std::collections::VecDeque;
 use std::future::{Future, poll_fn};
 use std::pin::Pin;
 use std::rc::Rc;
-use std::sync::Arc;
-use std::task::{Context, Poll, Wake, Waker};
+use std::task::{Context, Poll, Waker};
 
 use crate::shared::SitTask;
 
 /// Boxed future used by the crate's dyn-safe traits.
 pub type BoxFuture<'a, T> = Pin<Box<dyn Future<Output = T> + 'a>>;
-
-struct NoopWaker;
-
-impl Wake for NoopWaker {
-    fn wake(self: Arc<Self>) {}
-}
 
 /// A spawned task - the cancel/done surface `asyncio.Task` exposes to
 /// `ledge_sit_task`.
@@ -70,7 +63,7 @@ struct Task {
 }
 
 thread_local! {
-    static TASKS: RefCell<VecDeque<Rc<Task>>> = RefCell::new(VecDeque::new());
+    static TASKS: RefCell<VecDeque<Rc<Task>>> = const { RefCell::new(VecDeque::new()) };
     static NEXT_TASK_ID: Cell<u64> = const { Cell::new(1) };
     static CURRENT_TASK: Cell<Option<u64>> = const { Cell::new(None) };
 }
@@ -103,8 +96,7 @@ where
 /// Drives `future` to completion on this thread, polling spawned tasks
 /// round-robin between its polls (a deliberately tiny event loop).
 pub fn block_on<F: Future>(future: F) -> F::Output {
-    let waker = Waker::from(Arc::new(NoopWaker));
-    let mut cx = Context::from_waker(&waker);
+    let mut cx = Context::from_waker(Waker::noop());
     let mut main = Box::pin(future);
     loop {
         if let Poll::Ready(output) = main.as_mut().poll(&mut cx) {

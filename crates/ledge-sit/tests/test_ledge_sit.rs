@@ -377,11 +377,12 @@ fn test_seated_timeout_stands_her_up() {
     // (sit_then_stand) fires stand_up_from_ledge once its sleep elapses.
     block_on(async {
         let clock = Rc::new(RecordingSleeper::default());
+        let clock_slot: Rc<dyn Clock> = Rc::<RecordingSleeper>::clone(&clock);
         let overlay = Rc::new(FakeOverlay::new());
         let state = make_state(
             Rc::clone(&overlay),
             neutral_mood(),
-            Rc::clone(&clock),
+            clock_slot,
             Box::new(FixedRng(0.5)),
         );
         sit_on_ledge(&state, &ledge()).await;
@@ -450,7 +451,7 @@ fn test_support_drop_while_seated_unseats_without_sending_chair_end() {
     let overlay = Rc::new(FakeOverlay::new());
     let state = quiet_state(overlay, neutral_mood());
     let task = Rc::new(FakeTask::default());
-    let task_slot: Rc<dyn SitTask> = Rc::clone(&task);
+    let task_slot: Rc<dyn SitTask> = Rc::<FakeTask>::clone(&task);
     *state.seated_on_ledge.borrow_mut() = Some("win:1:0".to_string());
     *state.ledge_sit_task.borrow_mut() = Some(task_slot);
 
