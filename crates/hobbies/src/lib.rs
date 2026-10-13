@@ -9,6 +9,7 @@
 //!   - tidying: the WP-21 tidy routine, one piece of clutter at a time (only
 //!     when there is clutter);
 //!   - stretching: arm/neck stretches and looking around, a clip every ~minute.
+//!
 //! Each finished hobby is logged ("hobby" event -> the diary). On afk_end the
 //! current hobby winds down (item dissolves, she stands up) and the list of
 //! what she did rides along on the afk_end event, so felt-core's welcome-back
@@ -87,7 +88,7 @@ pub fn hobby_weights(
 ) -> HashMap<String, f64> {
     let energy = mood.get("energy").copied().unwrap_or(0.5);
     let boredom = mood.get("boredom").copied().unwrap_or(0.3);
-    let late = hour >= 23 || hour < 6;
+    let late = !(6..23).contains(&hour);
     let mut w = HashMap::from([
         ("reading".to_string(), 3.0),
         ("gaming".to_string(), 2.0 + 2.0 * energy),
@@ -101,10 +102,10 @@ pub fn hobby_weights(
         ),
         ("stretching".to_string(), 1.5 + boredom),
     ]);
-    if let Some(last) = last {
-        if let Some(weight) = w.get_mut(last) {
-            *weight = 0.0; // never the same one twice in a row
-        }
+    if let Some(last) = last
+        && let Some(weight) = w.get_mut(last)
+    {
+        *weight = 0.0; // never the same one twice in a row
     }
     w
 }
