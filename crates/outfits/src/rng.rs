@@ -127,7 +127,7 @@ impl PyRandom {
 
     /// `Random.getrandbits(k)` for `k <= 32`.
     fn getrandbits(&mut self, k: u32) -> u32 {
-        debug_assert!(k > 0 && k <= 32);
+        debug_assert!((1..=32).contains(&k));
         let r = self.genrand_u32();
         if k < 32 { r >> (32 - k) } else { r }
     }

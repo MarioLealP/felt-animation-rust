@@ -58,6 +58,9 @@ pub struct TaskSlot {
     handle: Mutex<Option<thread::JoinHandle<()>>>,
 }
 
+/// The spawn registry entries (`(task id, task)`), Python's `d._tasks` items.
+type TaskEntry = (usize, Arc<TaskSlot>);
+
 impl TaskSlot {
     fn new() -> Self {
         Self {
@@ -105,7 +108,7 @@ pub struct OutfitDirector {
     current_vrm: Mutex<Option<String>>,
     override_: Mutex<Option<Value>>,
     waiters: Mutex<HashMap<String, mpsc::Sender<bool>>>,
-    tasks: Arc<Mutex<Vec<(usize, Arc<TaskSlot>)>>>,
+    tasks: Arc<Mutex<Vec<TaskEntry>>>,
     next_task_id: AtomicUsize,
 }
 
@@ -231,12 +234,11 @@ impl OutfitDirector {
     pub fn daily_pick(&self, now: &DateTime) -> String {
         let ws = self.wardrobe.load();
         let today = effective_date(now).isoformat();
-        if ws.get("outfit_daily_date").and_then(Value::as_str) == Some(today.as_str()) {
-            if let Some(saved) = ws.get("outfit_daily").and_then(Value::as_str) {
-                if self.by_id.contains_key(saved) {
-                    return saved.to_string();
-                }
-            }
+        if ws.get("outfit_daily_date").and_then(Value::as_str) == Some(today.as_str())
+            && let Some(saved) = ws.get("outfit_daily").and_then(Value::as_str)
+            && self.by_id.contains_key(saved)
+        {
+            return saved.to_string();
         }
         let prev = ws.get("outfit_daily").cloned();
         let yesterday = prev.as_ref().and_then(Value::as_str);
@@ -264,10 +266,10 @@ impl OutfitDirector {
                 id_ok && until > now.timestamp()
             })
         });
-        if let Some(ov) = ov {
-            if let Some(id) = ov.get("id").and_then(Value::as_str) {
-                return id.to_string();
-            }
+        if let Some(ov) = ov
+            && let Some(id) = ov.get("id").and_then(Value::as_str)
+        {
+            return id.to_string();
         }
         self.daily_pick(now)
     }
@@ -281,14 +283,14 @@ impl OutfitDirector {
                 &owned
             }
         };
-        if let Some(sched) = scheduled_outfit(now, self.sleepy()) {
-            if self.by_id.contains_key(sched) {
-                // a scheduled change ends the override
-                if self.override_value().is_some() {
-                    self.set_override(None);
-                }
-                return sched.to_string();
+        if let Some(sched) = scheduled_outfit(now, self.sleepy())
+            && self.by_id.contains_key(sched)
+        {
+            // a scheduled change ends the override
+            if self.override_value().is_some() {
+                self.set_override(None);
             }
+            return sched.to_string();
         }
         self.day_outfit(now)
     }
@@ -467,11 +469,9 @@ impl OutfitDirector {
             self.set_current(outfit_id);
             *self.current_vrm.lock().unwrap() = Some(vrm.clone());
             self.save_fields(&[("outfit_current_vrm", json!(vrm))]);
-            match rx.recv_timeout(Duration::from_secs_f64(APPLY_TIMEOUT_S)) {
-                Ok(ok) => ok,
-                // no outfit_applied in time - the swap stands
-                Err(_) => true,
-            }
+            // no outfit_applied in time - the swap stands
+            rx.recv_timeout(Duration::from_secs_f64(APPLY_TIMEOUT_S))
+                .unwrap_or(true)
         })();
         self.waiters.lock().unwrap().remove(outfit_id);
         result
@@ -616,10 +616,10 @@ impl OutfitDirector {
                 .get("current_tee")
                 .and_then(Value::as_str)
                 .map(str::to_string);
-            if let Some(tee) = tee {
-                if !tee.is_empty() {
-                    wardrobe.apply_tee(overlay.as_ref(), &tee);
-                }
+            if let Some(tee) = tee
+                && !tee.is_empty()
+            {
+                wardrobe.apply_tee(overlay.as_ref(), &tee);
             }
         }
     }

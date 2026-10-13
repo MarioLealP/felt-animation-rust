@@ -63,7 +63,7 @@ impl WardrobeStore for FileWardrobe {
     }
 
     fn apply_tee(&self, overlay: &dyn Overlay, tee_name: &str) {
-        let albedo = format!("{}/{}.png", self.tees_dir, tee_name);
+        let albedo = format!("{}/{tee_name}.png", self.tees_dir);
         overlay.apply_garment("N00_004_01_Tops_01_CLOTH", &albedo);
     }
 }

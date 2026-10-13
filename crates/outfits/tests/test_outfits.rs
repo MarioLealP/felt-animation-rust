@@ -203,15 +203,15 @@ fn make(tmp: &Path, opts: MakeOpts) -> (Arc<OutfitDirector>, Ctx) {
     });
     let ledge: Arc<Mutex<Option<String>>> = Arc::new(Mutex::new(None));
     let state = Arc::new(OutfitState {
-        overlay: Arc::clone(&overlay),
-        behavior: Arc::clone(&behavior),
-        presence: Arc::clone(&presence),
+        overlay: overlay.clone(),
+        behavior: behavior.clone(),
+        presence: presence.clone(),
         presence_router: Arc::new(NoopPresenceRouter),
         mood: Arc::new(FakeMood {
             energy: opts.energy,
         }),
-        player: Arc::clone(&player),
-        props_director: Arc::clone(&props),
+        player: player.clone(),
+        props_director: props.clone(),
         accessories: None,
         seated_on_ledge: Arc::clone(&ledge),
         known_tags: Arc::new(Mutex::new(opts.tags.clone())),
@@ -229,7 +229,7 @@ fn make(tmp: &Path, opts: MakeOpts) -> (Arc<OutfitDirector>, Ctx) {
     let director = Arc::new(OutfitDirector::new(
         state,
         catalogue(),
-        Arc::clone(&wardrobe),
+        wardrobe.clone(),
         hooks,
         config,
     ));
@@ -358,7 +358,7 @@ fn test_ambient_pool_weighting() {
         .collect();
     assert!(picks.iter().all(|p| !special.contains(p)));
     let share = picks.iter().filter(|p| themed.contains(p)).count() as f64 / picks.len() as f64;
-    assert!(0.12 < share && share < 0.18);
+    assert!((0.12..0.18).contains(&share));
 }
 
 #[test]
