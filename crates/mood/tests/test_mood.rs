@@ -10,10 +10,10 @@ use felt_mood::{DateTime, MoodState, drift_annoyance, drift_boredom, drift_energ
 
 /// Mirrors the Python `_clocks` helper: read-only views over mutable boxes
 /// the test pokes between ticks.
-fn _clocks(
-    now_box: &Cell<f64>,
-    dt_box: &Cell<DateTime>,
-) -> (impl Fn() -> f64 + '_, impl Fn() -> DateTime + '_) {
+fn _clocks<'a>(
+    now_box: &'a Cell<f64>,
+    dt_box: &'a Cell<DateTime>,
+) -> (impl Fn() -> f64 + 'a, impl Fn() -> DateTime + 'a) {
     (move || now_box.get(), move || dt_box.get())
 }
 

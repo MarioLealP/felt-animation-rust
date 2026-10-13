@@ -78,6 +78,9 @@ const BOREDOM_RISE_PER_S: f64 = 1.0 / (45.0 * 60.0); // 0 -> 1 over ~45 idle min
 const ANNOYANCE_TAU_S: f64 = 30.0 * 60.0; // WP-15: "annoyance decays over ~30 min"
 
 /// Clamp to 0..=1, exactly as the Python did (`max(0.0, min(1.0, value))`).
+/// Not `f64::clamp`: that returns NaN for a NaN input, while the Python
+/// order yields 1.0.
+#[allow(clippy::manual_clamp)]
 fn clamp01(value: f64) -> f64 {
     value.min(1.0).max(0.0)
 }
@@ -320,10 +323,10 @@ pub fn load_mood_state(path: &Path) -> BTreeMap<String, f64> {
 /// Write `values` to `path` as pretty JSON (2-space indent, like the
 /// Python's `json.dumps(..., indent=2)`), creating the parent directory.
 pub fn save_mood_state(values: &BTreeMap<String, f64>, path: &Path) -> io::Result<()> {
-    if let Some(parent) = path.parent() {
-        if !parent.as_os_str().is_empty() {
-            fs::create_dir_all(parent)?;
-        }
+    if let Some(parent) = path.parent()
+        && !parent.as_os_str().is_empty()
+    {
+        fs::create_dir_all(parent)?;
     }
     let text = serde_json::to_string_pretty(values).map_err(io::Error::other)?;
     fs::write(path, text)
