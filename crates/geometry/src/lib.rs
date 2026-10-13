@@ -43,6 +43,13 @@ pub const SM_CYSCREEN: i32 = 1;
 /// Win32 `MONITORINFOF_PRIMARY` - the primary-monitor flag in `dwFlags`.
 pub const MONITORINFOF_PRIMARY: u32 = 1;
 
+/// One monitor's rect in virtual-desktop pixels: `(x, y, w, h)`.
+pub type MonitorRect = (i32, i32, i32, i32);
+
+/// All monitors' rects plus the primary's index:
+/// `([(x, y, w, h) per monitor], index of the primary)`.
+pub type MonitorRects = Option<(Vec<MonitorRect>, usize)>;
+
 /// The Win32 display calls this module's estimates were written against
 /// (`GetSystemMetrics`, `EnumDisplayMonitors`, `GetMonitorInfoW`). No
 /// implementation ships with this crate (pure logic only); the platform layer
@@ -55,7 +62,7 @@ pub trait DisplayMetrics {
 
     /// (`[(x, y, w, h)` per monitor`], index of the primary), in the order
     /// Windows enumerates them, or `None` on failure.
-    fn monitor_rects(&self) -> Option<(Vec<(i32, i32, i32, i32)>, usize)>;
+    fn monitor_rects(&self) -> MonitorRects;
 }
 
 /// Python's `max(a, b)` for floats: returns `a` unless `b > a` (so a NaN

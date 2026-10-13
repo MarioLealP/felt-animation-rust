@@ -2,7 +2,8 @@
 //! main.gd's camera framing, instead of a hardcoded 4.0 exit x.
 
 use felt_geometry::{
-    OverlayGeometry, View, estimate_from_monitors, estimate_geometry, from_overlay_report,
+    MonitorRect, OverlayGeometry, View, estimate_from_monitors, estimate_geometry,
+    from_overlay_report,
 };
 use serde_json::{Value, json};
 
@@ -96,7 +97,7 @@ fn test_monitor_estimate_matches_what_main_gd_reports() {
     assert!((est.span().1 - rep.span().1).abs() < 1e-3);
     assert!((est.roam().0 - rep.roam().0).abs() < 1e-3);
     assert!((est.roam().1 - rep.roam().1).abs() < 1e-3);
-    let dims = |g: &OverlayGeometry| -> Vec<(i32, i32, i32, i32)> {
+    let dims = |g: &OverlayGeometry| -> Vec<MonitorRect> {
         g.views.iter().map(|v| (v.x, v.y, v.w, v.h)).collect()
     };
     assert_eq!(dims(&est), dims(&rep));
