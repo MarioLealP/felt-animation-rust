@@ -26,10 +26,10 @@ mod fft;
 mod lock;
 mod tempo;
 
-pub use lock::{monotonic_seconds, TempoLock, BPM_TOLERANCE, LOCK_HOLD_S, MIN_CONFIDENCE};
+pub use lock::{BPM_TOLERANCE, LOCK_HOLD_S, MIN_CONFIDENCE, TempoLock, monotonic_seconds};
 pub use tempo::{
-    beat_phase, estimate_tempo, estimate_tempo_acf, estimate_tempo_from_audio,
-    inter_onset_intervals, onset_envelope, ACF_MAX_BPM, ACF_MIN_BPM,
+    ACF_MAX_BPM, ACF_MIN_BPM, beat_phase, estimate_tempo, estimate_tempo_acf,
+    estimate_tempo_from_audio, inter_onset_intervals, onset_envelope,
 };
 
 // -- onset detection ---------------------------------------------------

@@ -125,7 +125,7 @@ pub fn onset_envelope(frames: &[f64], samplerate: u32) -> (Vec<f64>, f64) {
         .collect();
     // Only bins below FLUX_MAX_HZ count (numpy: freqs < 8000).
     let keep: Vec<usize> = (0..FLUX_FFT / 2 + 1)
-        .filter(|&k| k as f64 * samplerate as f64 / FLUX_FFT as f64 < FLUX_MAX_HZ)
+        .filter(|&k| k as f64 * samplerate as f64 / (FLUX_FFT as f64) < FLUX_MAX_HZ)
         .collect();
 
     let mut log_mag = vec![vec![0.0; keep.len()]; n_frames];
@@ -230,7 +230,11 @@ pub fn estimate_tempo_acf(
 
     let mut offset = 0.0;
     if (1..n as i64 - 1).contains(&lag) {
-        let (a, b, c) = (acf[(lag - 1) as usize], acf[lag as usize], acf[(lag + 1) as usize]);
+        let (a, b, c) = (
+            acf[(lag - 1) as usize],
+            acf[lag as usize],
+            acf[(lag + 1) as usize],
+        );
         let denom = a - 2.0 * b + c;
         if denom != 0.0 {
             offset = (0.5 * (a - c) / denom).clamp(-0.5, 0.5);
