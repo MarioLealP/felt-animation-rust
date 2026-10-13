@@ -157,7 +157,11 @@ fn test_peaks_respect_the_refractory_gap() {
     let peaks = detect_envelope_peaks(&parts, 1, samplerate);
     assert!(!peaks.is_empty());
     // peaks.windows(2) pairs consecutive peaks, like zip(peaks, peaks[1:]).
-    assert!(peaks.windows(2).all(|w| w[1] - w[0] >= PEAK_REFRACTORY_S - 1e-9));
+    assert!(
+        peaks
+            .windows(2)
+            .all(|w| w[1] - w[0] >= PEAK_REFRACTORY_S - 1e-9)
+    );
     assert!(PEAK_REFRACTORY_S >= 0.45); // at least main.gd's own accent refractory
 }
 
