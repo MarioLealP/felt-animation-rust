@@ -74,7 +74,8 @@ where
             } else {
                 None
             };
-            state.behavior
+            state
+                .behavior
                 .walk_body(x, loop_tag, false, None, None, false, STEP_TIMEOUT_S)
                 .await;
             true
@@ -88,7 +89,11 @@ where
             };
             *state.pending_platform_id.borrow_mut() = Some(hop.to_platform.clone());
             state.overlay.hop(target.y).await;
-            state.overlay.wait_for_landed(STEP_TIMEOUT_S).await.is_some()
+            state
+                .overlay
+                .wait_for_landed(STEP_TIMEOUT_S)
+                .await
+                .is_some()
         }
         Step::Climb(climb) => {
             let Some(target) = target_platform(state, &climb.to_platform) else {
@@ -96,7 +101,11 @@ where
             };
             *state.pending_platform_id.borrow_mut() = Some(climb.to_platform.clone());
             state.overlay.climb(target.y, climb.meters).await;
-            state.overlay.wait_for_climbed(STEP_TIMEOUT_S).await.is_some()
+            state
+                .overlay
+                .wait_for_climbed(STEP_TIMEOUT_S)
+                .await
+                .is_some()
         }
     }
 }

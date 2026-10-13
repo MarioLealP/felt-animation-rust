@@ -13,8 +13,8 @@ use std::task::{Context, Poll, Wake, Waker};
 use std::thread::{self, Thread};
 
 use felt_nav_executor::{
-    run_plan, AppState, Climb, ClimbedNotice, Geometry, HopDown, LandedNotice, NoopStandUpHooks,
-    Overlay, Platform, Step, Walk,
+    AppState, Climb, ClimbedNotice, Geometry, HopDown, LandedNotice, NoopStandUpHooks, Overlay,
+    Platform, Step, Walk, run_plan,
 };
 
 // -- a std-only block_on to drive the async API in tests ----------------------
@@ -177,7 +177,10 @@ fn test_hop_down_step_sends_hop_and_waits_for_landed() {
         .await;
         assert!(ok);
         assert_eq!(*overlay.hops.borrow(), [floor().y]);
-        assert_eq!(state.pending_platform_id.borrow().as_deref(), Some("floor:0"));
+        assert_eq!(
+            state.pending_platform_id.borrow().as_deref(),
+            Some("floor:0")
+        );
     })
 }
 
@@ -201,7 +204,10 @@ fn test_climb_step_sends_climb_with_meters_and_waits_for_climbed() {
         .await;
         assert!(ok);
         assert_eq!(*overlay.climbs.borrow(), [(ledge().y, 2)]);
-        assert_eq!(state.pending_platform_id.borrow().as_deref(), Some("win:1:0"));
+        assert_eq!(
+            state.pending_platform_id.borrow().as_deref(),
+            Some("win:1:0")
+        );
     })
 }
 
@@ -256,7 +262,10 @@ fn test_base_lock_is_held_for_the_whole_plan() {
         assert!(!state.behavior.base_busy());
         let ok = run_plan(
             &state,
-            &[Step::Walk(Walk { x_px: 100.0 }), Step::Walk(Walk { x_px: 200.0 })],
+            &[
+                Step::Walk(Walk { x_px: 100.0 }),
+                Step::Walk(Walk { x_px: 200.0 }),
+            ],
         )
         .await;
         assert!(ok);

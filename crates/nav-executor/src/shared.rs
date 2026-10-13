@@ -25,7 +25,7 @@
 
 use std::cell::{Cell, RefCell};
 use std::collections::{HashMap, HashSet};
-use std::future::{poll_fn, Future};
+use std::future::{Future, poll_fn};
 use std::pin::pin;
 use std::rc::Rc;
 use std::sync::Mutex;
@@ -291,7 +291,9 @@ impl<O: Overlay> BehaviorState<O> {
         clip_timeout: f64,
     ) {
         if let Some(start_tag) = start_tag {
-            self.overlay.play_and_wait(start_tag, clip_timeout, None).await;
+            self.overlay
+                .play_and_wait(start_tag, clip_timeout, None)
+                .await;
         }
         // The arrived waiter is armed (first-polled) before the move goes
         // out, so an instant reply (a move to where she already stands)
@@ -305,7 +307,9 @@ impl<O: Overlay> BehaviorState<O> {
         };
         join2(self.overlay.wait_for_arrived(clip_timeout), walk).await;
         if let Some(stop_tag) = stop_tag {
-            self.overlay.play_and_wait(stop_tag, clip_timeout, None).await;
+            self.overlay
+                .play_and_wait(stop_tag, clip_timeout, None)
+                .await;
         }
     }
 
@@ -391,7 +395,8 @@ pub async fn stand_up_if_sitting<O: Overlay, H: StandUpHooks, G: Geometry>(
             .hooks
             .sit_to_stand_clip()
             .map(|clip| HashMap::from([("transition/sit_to_stand".to_string(), clip)]));
-        state.behavior
+        state
+            .behavior
             .run_sequence(&["transition/sit_to_stand"], CLIP_TIMEOUT, clips.as_ref())
             .await;
     }
