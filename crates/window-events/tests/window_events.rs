@@ -118,14 +118,14 @@ fn test_ride_off_the_end_returns_none() {
 #[test]
 fn test_ride_no_movement_is_not_a_ride() {
     let win = mk_win(1, (100.0, 600.0, 900.0, 900.0), "Notepad");
-    assert!(detect_ride(Some(&ledge()), std::slice::from_ref(&win), &[win], 500.0).is_none());
+    assert!(detect_ride(Some(&ledge()), std::slice::from_ref(&win), std::slice::from_ref(&win), 500.0).is_none());
 }
 
 #[test]
 fn test_ride_none_when_not_on_a_window_platform() {
     let floor = floor0();
     let win = mk_win(1, (100.0, 600.0, 900.0, 900.0), "Notepad");
-    assert!(detect_ride(Some(&floor), std::slice::from_ref(&win), &[win], 500.0).is_none());
+    assert!(detect_ride(Some(&floor), std::slice::from_ref(&win), std::slice::from_ref(&win), 500.0).is_none());
 }
 
 #[test]
@@ -320,7 +320,7 @@ fn test_try_ride_returns_false_when_not_riding() {
         false,
         &[ledge()],
         std::slice::from_ref(&win),
-        &[win],
+        std::slice::from_ref(&win),
     ));
 
     assert!(!rode);
