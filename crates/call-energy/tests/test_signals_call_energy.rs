@@ -40,8 +40,13 @@ fn test_no_lively_event_on_low_peaks() {
 fn test_lively_fires_after_sustained_high_energy() {
     let (clock, now_fn) = fake_clock();
     // Python: smoothing=1.0; quiet_hang_s defaulted.
-    let mut tracker =
-        CallEnergyTracker::new(LIVELY_PEAK_THRESHOLD, LIVELY_SUSTAIN_S, QUIET_HANG_S, 1.0, now_fn);
+    let mut tracker = CallEnergyTracker::new(
+        LIVELY_PEAK_THRESHOLD,
+        LIVELY_SUSTAIN_S,
+        QUIET_HANG_S,
+        1.0,
+        now_fn,
+    );
 
     assert!(tracker.update(0.5).is_none()); // smoothed jumps straight to 0.5 with smoothing=1.0, t=0
     *clock.borrow_mut() = 4.9;
@@ -53,8 +58,13 @@ fn test_lively_fires_after_sustained_high_energy() {
 #[test]
 fn test_quiet_fires_after_energy_drops_and_hangs() {
     let (clock, now_fn) = fake_clock();
-    let mut tracker =
-        CallEnergyTracker::new(LIVELY_PEAK_THRESHOLD, LIVELY_SUSTAIN_S, QUIET_HANG_S, 1.0, now_fn);
+    let mut tracker = CallEnergyTracker::new(
+        LIVELY_PEAK_THRESHOLD,
+        LIVELY_SUSTAIN_S,
+        QUIET_HANG_S,
+        1.0,
+        now_fn,
+    );
     let _ = tracker.update(0.5);
     *clock.borrow_mut() = 5.0;
     assert_eq!(tracker.update(0.5), Some("lively"));
@@ -68,8 +78,13 @@ fn test_quiet_fires_after_energy_drops_and_hangs() {
 #[test]
 fn test_quiet_does_not_fire_on_a_brief_dip() {
     let (clock, now_fn) = fake_clock();
-    let mut tracker =
-        CallEnergyTracker::new(LIVELY_PEAK_THRESHOLD, LIVELY_SUSTAIN_S, QUIET_HANG_S, 1.0, now_fn);
+    let mut tracker = CallEnergyTracker::new(
+        LIVELY_PEAK_THRESHOLD,
+        LIVELY_SUSTAIN_S,
+        QUIET_HANG_S,
+        1.0,
+        now_fn,
+    );
     let _ = tracker.update(0.5);
     *clock.borrow_mut() = 5.0;
     let _ = tracker.update(0.5); // lively
