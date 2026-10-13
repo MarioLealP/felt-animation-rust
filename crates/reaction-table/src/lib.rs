@@ -126,13 +126,11 @@ pub fn pick_reaction<'a, R: RandomLike>(
                 for (mood_key, multiplier) in boosts {
                     let multiplier = multiplier.as_f64().unwrap_or(1.0);
                     // Python: level = max(0.0, min(1.0, mood.get(mood_key, 0.0))).
-                    // min before max keeps that exact order of operations.
-                    let level = mood
-                        .get(mood_key.as_str())
-                        .copied()
-                        .unwrap_or(0.0)
-                        .min(1.0)
-                        .max(0.0);
+                    // That equals clamp(0.0, 1.0) except for NaN: CPython's
+                    // min/max drop the NaN operand (min(1.0, NaN) == 1.0),
+                    // where f64::clamp would propagate NaN into the weight.
+                    let raw = mood.get(mood_key.as_str()).copied().unwrap_or(0.0);
+                    let level = if raw.is_nan() { 1.0 } else { raw.clamp(0.0, 1.0) };
                     weight *= 1.0 + (multiplier - 1.0) * level;
                 }
             }
