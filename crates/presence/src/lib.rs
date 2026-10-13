@@ -196,6 +196,7 @@ impl From<(f64, f64)> for RoamSpan {
 /// - `cursor_world_x`: the cursor's world x (WP-22, any monitor). Without
 ///   it, `cursor_fraction_x` (0.0 = left edge, 1.0 = right edge of the
 ///   range) stands in for it.
+///
 /// Pure/tested; never returns `current_x` itself when the roam range can
 /// possibly avoid it, so repeated presses don't ever look like a
 /// no-op/teleport-in-place.
