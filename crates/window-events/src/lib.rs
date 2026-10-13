@@ -83,7 +83,7 @@ pub fn covers_whole_monitor_tol(rect: Rect, monitor: &Monitor, tol: f64) -> bool
     left <= monitor.left + tol
         && right >= monitor.right - tol
         && top <= monitor.top + tol
-        && bottom >= monitor.floor_y - tol
+        && bottom >= monitor.floor_y() - tol
 }
 
 /// [`covers_whole_monitor_tol`] with world.py's default tolerance.
