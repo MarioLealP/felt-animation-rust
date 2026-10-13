@@ -59,7 +59,7 @@ pub fn discover_sources(games_path: &Path, discovery: &dyn GameSourceDiscovery) 
         &epic_refs,
         &gog_refs,
         &known_refs,
-        &[felt],
+        &[&felt],
     )
 }
 

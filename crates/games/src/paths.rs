@@ -5,7 +5,7 @@
 /// Windows-style normalized, case-folded path - the tracking key.
 /// `ntpath.normcase(ntpath.normpath(path.strip()))`.
 pub fn norm_path(path: &str) -> String {
-    ntpath_normcase(ntpath_normpath(path.trim()))
+    ntpath_normcase(&ntpath_normpath(path.trim()))
 }
 
 /// Lowercased final path component (`ntpath.basename(path).lower()`).
