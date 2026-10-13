@@ -116,7 +116,9 @@ fn climb_meters_for_rise(rise_px: f64, ppm: f64) -> Option<u32> {
         return None;
     }
     let rise_m = rise_px / ppm;
-    CLIMB_METERS.into_iter().find(|&meters| rise_m <= f64::from(meters) * CLIMB_TOLERANCE)
+    CLIMB_METERS
+        .into_iter()
+        .find(|&meters| rise_m <= f64::from(meters) * CLIMB_TOLERANCE)
 }
 
 fn build_edges(platforms: &[Platform], ppm: f64) -> HashMap<String, Vec<Edge>> {

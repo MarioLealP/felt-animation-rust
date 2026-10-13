@@ -2,7 +2,7 @@
 //! throughout (her real measured scale, per the WP-23 build notes - a 540 px
 //! character at ~1.6 m tall).
 
-use felt_navigation::{plan_route, Climb, Platform, PlatformKind, Step, Walk};
+use felt_navigation::{Climb, Platform, PlatformKind, Step, Walk, plan_route};
 
 const PPM: f64 = 340.0;
 
@@ -59,11 +59,22 @@ fn test_same_platform_is_just_a_walk() {
 
 #[test]
 fn test_hop_down_from_a_window_to_the_floor_below() {
-    let plan = plan_route(&[window(), floor0()], PPM, "win:1:0", 300.0, "floor:0", 1000.0);
+    let plan = plan_route(
+        &[window(), floor0()],
+        PPM,
+        "win:1:0",
+        300.0,
+        "floor:0",
+        1000.0,
+    );
     let Some(plan) = plan else {
         panic!("plan is not None");
     };
-    let [Step::Walk(walk_to_edge), Step::HopDown(hop), Step::Walk(final_walk)] = plan.as_slice()
+    let [
+        Step::Walk(walk_to_edge),
+        Step::HopDown(hop),
+        Step::Walk(final_walk),
+    ] = plan.as_slice()
     else {
         panic!("walk_to_edge, hop, final_walk = plan; got {plan:?}");
     };
@@ -91,7 +102,11 @@ fn test_climb_1m_onto_a_platform_a_little_over_a_quarter_screen_up() {
     let Some(plan) = plan else {
         panic!("plan is not None");
     };
-    let [Step::Walk(walk_to_edge), Step::Climb(climb), Step::Walk(final_walk)] = plan.as_slice()
+    let [
+        Step::Walk(walk_to_edge),
+        Step::Climb(climb),
+        Step::Walk(final_walk),
+    ] = plan.as_slice()
     else {
         panic!("walk_to_edge, climb, final_walk = plan; got {plan:?}");
     };
@@ -105,7 +120,14 @@ fn test_climb_1m_onto_a_platform_a_little_over_a_quarter_screen_up() {
 fn test_climb_2m_onto_the_side_monitor_seam() {
     // 1437 - 897 = 540 px rise / 340 ppm = 1.59 m -> climb/2m (smallest clip
     // that covers it - climb/1m tops out at ~1.05 m).
-    let plan = plan_route(&[floor1(), seam()], PPM, "floor:1", 2000.0, "seam:0", 2500.0);
+    let plan = plan_route(
+        &[floor1(), seam()],
+        PPM,
+        "floor:1",
+        2000.0,
+        "seam:0",
+        2500.0,
+    );
     let Some(plan) = plan else {
         panic!("plan is not None");
     };
@@ -199,7 +221,14 @@ fn test_unreachable_target_platform_returns_none() {
         y: 500.0,
         kind: PlatformKind::Window,
     };
-    let plan = plan_route(&[floor0(), isolated], PPM, "floor:0", 100.0, "win:9:0", 5100.0);
+    let plan = plan_route(
+        &[floor0(), isolated],
+        PPM,
+        "floor:0",
+        100.0,
+        "win:9:0",
+        5100.0,
+    );
     assert!(plan.is_none());
 }
 
@@ -211,7 +240,14 @@ fn test_unknown_target_platform_id_returns_none() {
 
 #[test]
 fn test_cross_monitor_goes_via_floors_with_no_hop_or_climb_steps() {
-    let plan = plan_route(&[floor0(), floor1()], PPM, "floor:0", 1000.0, "floor:1", 2200.0);
+    let plan = plan_route(
+        &[floor0(), floor1()],
+        PPM,
+        "floor:0",
+        1000.0,
+        "floor:1",
+        2200.0,
+    );
     // Floor-to-floor is transparent walking (WP-22 already spans monitors) -
     // just the final walk, no hop/climb noise.
     assert_eq!(plan, Some(vec![Step::Walk(Walk { x_px: 2200.0 })]));
@@ -221,7 +257,14 @@ fn test_cross_monitor_goes_via_floors_with_no_hop_or_climb_steps() {
 fn test_seam_reachable_from_the_far_floor_via_the_side_floor() {
     // From the PRIMARY floor to the seam: no direct x overlap/height edge
     // from floor:0 to the seam, but floor:0 -> floor:1 (free) -> climb.
-    let plan = plan_route(&[floor0(), floor1(), seam()], PPM, "floor:0", 1000.0, "seam:0", 2500.0);
+    let plan = plan_route(
+        &[floor0(), floor1(), seam()],
+        PPM,
+        "floor:0",
+        1000.0,
+        "seam:0",
+        2500.0,
+    );
     let Some(plan) = plan else {
         panic!("plan is not None");
     };

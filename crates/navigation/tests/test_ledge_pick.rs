@@ -1,6 +1,6 @@
 //! ledges_near: the "force her onto a ledge" picker.
 
-use felt_navigation::{ledges_near, Platform, PlatformKind, LEDGE_MIN_WIDTH_PX};
+use felt_navigation::{LEDGE_MIN_WIDTH_PX, Platform, PlatformKind, ledges_near};
 
 fn floor() -> Platform {
     Platform {
