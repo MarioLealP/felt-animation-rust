@@ -410,10 +410,13 @@ fn test_bikini_reply_triggers_quick_change() {
     assert_eq!(d.current(), "bikini");
 }
 
+/// One way to put the director's context into a "must defer" state.
+type Mutation = Box<dyn Fn(&Ctx)>;
+
 #[test]
 fn test_defer_while_seated_hidden_speaking() {
     let dir = tmp_dir("defer");
-    let mutations: Vec<Box<dyn Fn(&Ctx)>> = vec![
+    let mutations: Vec<Mutation> = vec![
         Box::new(|ctx| *ctx.ledge.lock().unwrap() = Some("w1".to_string())),
         Box::new(|ctx| *ctx.props.seated.lock().unwrap() = Some("chair".to_string())),
         Box::new(|ctx| *ctx.behavior.posture.lock().unwrap() = "sitting".to_string()),
