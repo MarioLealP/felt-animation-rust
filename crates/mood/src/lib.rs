@@ -197,8 +197,10 @@ where
         let energy = self.values["energy"];
         let boredom = self.values["boredom"];
         let annoyance = self.values["annoyance"];
-        self.values
-            .insert("energy".to_string(), drift_energy(energy, hour as i32, elapsed));
+        self.values.insert(
+            "energy".to_string(),
+            drift_energy(energy, hour as i32, elapsed),
+        );
         self.values
             .insert("boredom".to_string(), drift_boredom(boredom, elapsed));
         self.values
@@ -224,8 +226,10 @@ where
         // deliberately NOT touched here - it's the slow-building
         // "relationship" axis, not a daily transient like the other four.
         self.values.insert("annoyance".to_string(), 0.0);
-        self.values
-            .insert("boredom".to_string(), (self.values["boredom"] - 0.3).max(0.0));
+        self.values.insert(
+            "boredom".to_string(),
+            (self.values["boredom"] - 0.3).max(0.0),
+        );
         self.values.insert(
             "happiness".to_string(),
             self.values["happiness"] * 0.5 + 0.6 * 0.5,
