@@ -162,7 +162,7 @@ fn test_peaks_respect_the_refractory_gap() {
             .windows(2)
             .all(|w| w[1] - w[0] >= PEAK_REFRACTORY_S - 1e-9)
     );
-    assert!(PEAK_REFRACTORY_S >= 0.45); // at least main.gd's own accent refractory
+    const { assert!(PEAK_REFRACTORY_S >= 0.45) }; // at least main.gd's own accent refractory
 }
 
 #[test]
