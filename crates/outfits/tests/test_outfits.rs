@@ -10,17 +10,17 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use felt_outfits::director::{DirectorConfig, DirectorHooks};
 use felt_outfits::state::{
-    Behavior, HoldGuard, Mood, OutfitState, Overlay, Player, Presence, PresenceRouter,
-    PropsDirector, HIDDEN, VISIBLE,
+    Behavior, HIDDEN, HoldGuard, Mood, OutfitState, Overlay, Player, Presence, PresenceRouter,
+    PropsDirector, VISIBLE,
 };
 use felt_outfits::wardrobe::{FileWardrobe, WardrobeStore};
 use felt_outfits::{
-    ambient_pick, bikini_roll, effective_date, load_outfits, pool_ids, scheduled_outfit, Date,
-    DateTime, OutfitDirector, OutfitRng, PyRandom,
+    Date, DateTime, OutfitDirector, OutfitRng, PyRandom, ambient_pick, bikini_roll, effective_date,
+    load_outfits, pool_ids, scheduled_outfit,
 };
 
 // -- helpers ---------------------------------------------------------------
@@ -30,7 +30,8 @@ fn dt(m: u32, d: u32, h: u32) -> DateTime {
 }
 
 fn catalogue() -> Vec<felt_outfits::Outfit> {
-    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../ref/felt-animation/outfits.json");
+    let root =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../ref/felt-animation/outfits.json");
     load_outfits(&root)
 }
 
@@ -259,14 +260,20 @@ fn test_catalogue_pools() {
             .map(|s| s.to_string())
             .collect::<std::collections::BTreeSet<_>>()
     };
-    assert_eq!(as_set(p("themed")), expected(&["china", "maid", "cyberpunk", "cyberpunk2"]));
+    assert_eq!(
+        as_set(p("themed")),
+        expected(&["china", "maid", "cyberpunk", "cyberpunk2"])
+    );
     assert_eq!(
         as_set(p("special")),
         expected(&["pyjama", "halloween", "xmas", "reindeer", "bikini"])
     );
     assert!(p("daily").contains(&"default".to_string()));
     assert_eq!(p("daily").len(), 8);
-    let default = cat.iter().find(|e| e.id == "default").expect("default entry");
+    let default = cat
+        .iter()
+        .find(|e| e.id == "default")
+        .expect("default entry");
     assert_eq!(default.vrm, "res://characters/felt.vrm");
 }
 
@@ -295,8 +302,22 @@ fn test_daily_pick_avoids_yesterday_and_persists() {
 
 #[test]
 fn test_daily_pick_rolls_at_five_not_midnight() {
-    assert_eq!(effective_date(&dt(9, 16, 3)), Date { year: 2026, month: 9, day: 15 });
-    assert_eq!(effective_date(&dt(9, 16, 5)), Date { year: 2026, month: 9, day: 16 });
+    assert_eq!(
+        effective_date(&dt(9, 16, 3)),
+        Date {
+            year: 2026,
+            month: 9,
+            day: 15
+        }
+    );
+    assert_eq!(
+        effective_date(&dt(9, 16, 5)),
+        Date {
+            year: 2026,
+            month: 9,
+            day: 16
+        }
+    );
 }
 
 #[test]
@@ -308,7 +329,14 @@ fn test_date_and_night_rules() {
         .collect();
     assert_eq!(
         got,
-        vec![None, Some("xmas"), Some("reindeer"), Some("xmas"), Some("reindeer"), None]
+        vec![
+            None,
+            Some("xmas"),
+            Some("reindeer"),
+            Some("xmas"),
+            Some("reindeer"),
+            None
+        ]
     );
     assert_eq!(scheduled_outfit(&dt(9, 15, 0), false), None);
     assert_eq!(scheduled_outfit(&dt(9, 15, 1), false), Some("pyjama"));
@@ -323,7 +351,8 @@ fn test_ambient_pool_weighting() {
     let mut rng = PyRandom::from_seed(7);
     let daily = pool_ids(&cat, "daily");
     let themed = pool_ids(&cat, "themed");
-    let special: std::collections::BTreeSet<String> = pool_ids(&cat, "special").into_iter().collect();
+    let special: std::collections::BTreeSet<String> =
+        pool_ids(&cat, "special").into_iter().collect();
     let picks: Vec<String> = (0..4000)
         .map(|_| ambient_pick(&daily, &themed, &mut rng))
         .collect();
@@ -334,10 +363,26 @@ fn test_ambient_pool_weighting() {
 
 #[test]
 fn test_bikini_only_on_sunny_weather_tag() {
-    assert!(bikini_roll(Some("reaction/weather/sunny"), &mut FixedRng(0.0), 0.01));
-    assert!(!bikini_roll(Some("reaction/weather/sunny"), &mut FixedRng(0.5), 0.01));
-    assert!(!bikini_roll(Some("reaction/weather/rain"), &mut FixedRng(0.0), 0.01));
-    assert!(!bikini_roll(Some("reaction/happy"), &mut FixedRng(0.0), 0.01));
+    assert!(bikini_roll(
+        Some("reaction/weather/sunny"),
+        &mut FixedRng(0.0),
+        0.01
+    ));
+    assert!(!bikini_roll(
+        Some("reaction/weather/sunny"),
+        &mut FixedRng(0.5),
+        0.01
+    ));
+    assert!(!bikini_roll(
+        Some("reaction/weather/rain"),
+        &mut FixedRng(0.0),
+        0.01
+    ));
+    assert!(!bikini_roll(
+        Some("reaction/happy"),
+        &mut FixedRng(0.0),
+        0.01
+    ));
     assert!(!bikini_roll(None, &mut FixedRng(0.0), 0.01));
 }
 
@@ -352,7 +397,9 @@ fn test_bikini_reply_triggers_quick_change() {
     assert_eq!(d.task_count(), 0);
     Arc::clone(&d).on_reply_tag(Some("reaction/weather/sunny"));
     let task = d.first_task().expect("bikini task spawned");
-    wait_until("overlay send", || !ctx.overlay.sent.lock().unwrap().is_empty());
+    wait_until("overlay send", || {
+        !ctx.overlay.sent.lock().unwrap().is_empty()
+    });
     d.on_overlay_message(&json!({"outfit_applied": {"id": "bikini"}}));
     task.join();
     let sent = ctx.overlay.sent.lock().unwrap();
@@ -375,13 +422,25 @@ fn test_defer_while_seated_hidden_speaking() {
         Box::new(|ctx| *ctx.behavior.busy.lock().unwrap() = true),
     ];
     for mutate in &mutations {
-        let (d, ctx) = make(&dir, MakeOpts { when: dt(10, 31, 12), ..Default::default() }); // halloween wanted
+        let (d, ctx) = make(
+            &dir,
+            MakeOpts {
+                when: dt(10, 31, 12),
+                ..Default::default()
+            },
+        ); // halloween wanted
         mutate(&ctx);
         assert!(!d.can_change());
         assert!(d.tick(None).is_none());
         assert!(ctx.overlay.sent.lock().unwrap().is_empty());
     }
-    let (d, _ctx) = make(&dir, MakeOpts { when: dt(10, 31, 12), ..Default::default() });
+    let (d, _ctx) = make(
+        &dir,
+        MakeOpts {
+            when: dt(10, 31, 12),
+            ..Default::default()
+        },
+    );
     assert!(d.can_change());
 }
 
@@ -398,15 +457,23 @@ fn test_quick_change_plays_spin_then_swaps() {
     d.set_quick_swap_delay(0.0);
     let worker = Arc::clone(&d);
     let handle = thread::spawn(move || worker.change_to("maid", "quick"));
-    wait_until("overlay send", || !ctx.overlay.sent.lock().unwrap().is_empty());
+    wait_until("overlay send", || {
+        !ctx.overlay.sent.lock().unwrap().is_empty()
+    });
     d.on_overlay_message(&json!({"outfit_applied": {"id": "maid"}}));
     assert!(handle.join().unwrap());
     assert_eq!(
         *ctx.behavior.clips.lock().unwrap(),
         vec![vec!["gesture/spin".to_string()]]
     );
-    assert_eq!(ctx.overlay.sent.lock().unwrap()[0]["outfit"]["fx"], json!("puff"));
-    assert_eq!(ctx.wardrobe.load().get("outfit_current"), Some(&json!("maid")));
+    assert_eq!(
+        ctx.overlay.sent.lock().unwrap()[0]["outfit"]["fx"],
+        json!("puff")
+    );
+    assert_eq!(
+        ctx.wardrobe.load().get("outfit_current"),
+        Some(&json!("maid"))
+    );
 }
 
 #[test]
@@ -415,7 +482,9 @@ fn test_quick_without_spin_clip_still_swaps() {
     let (d, ctx) = make(&dir, MakeOpts::default());
     let worker = Arc::clone(&d);
     let handle = thread::spawn(move || worker.change_to("china", "quick"));
-    wait_until("overlay send", || !ctx.overlay.sent.lock().unwrap().is_empty());
+    wait_until("overlay send", || {
+        !ctx.overlay.sent.lock().unwrap().is_empty()
+    });
     d.on_overlay_message(&json!({"outfit_applied": {"id": "china"}}));
     assert!(handle.join().unwrap());
     assert!(ctx.behavior.clips.lock().unwrap().is_empty());
@@ -427,7 +496,9 @@ fn test_failure_falls_back_to_default() {
     let (d, ctx) = make(&dir, MakeOpts::default());
     let worker = Arc::clone(&d);
     let handle = thread::spawn(move || worker.change_to("maid", "quick"));
-    wait_until("overlay send", || !ctx.overlay.sent.lock().unwrap().is_empty());
+    wait_until("overlay send", || {
+        !ctx.overlay.sent.lock().unwrap().is_empty()
+    });
     d.on_overlay_message(&json!({"outfit_failed": {"id": "maid", "error": "boom"}}));
     assert!(!handle.join().unwrap());
     wait_until("fallback default send", || {
@@ -451,7 +522,9 @@ fn test_reconnect_resends_current_outfit() {
     d.on_connected();
     assert_eq!(
         *ctx.overlay.sent.lock().unwrap(),
-        vec![json!({"outfit": {"id": "sport", "vrm": "res://characters/Felt_Sport.vrm", "fx": "none"}})]
+        vec![
+            json!({"outfit": {"id": "sport", "vrm": "res://characters/Felt_Sport.vrm", "fx": "none"}})
+        ]
     );
     let (d2, _ctx) = make(&dir, MakeOpts::default()); // persisted across a restart
     assert_eq!(d2.current(), "sport");
@@ -476,7 +549,9 @@ fn test_ambient_tick_quick_change_and_override() {
     d.set_current("sport");
     let worker = Arc::clone(&d);
     let handle = thread::spawn(move || worker.tick(None));
-    wait_until("overlay send", || !ctx.overlay.sent.lock().unwrap().is_empty());
+    wait_until("overlay send", || {
+        !ctx.overlay.sent.lock().unwrap().is_empty()
+    });
     let sent_id = ctx.overlay.sent.lock().unwrap()[0]["outfit"]["id"]
         .as_str()
         .expect("sent id")
@@ -500,7 +575,13 @@ fn test_sleepy_target_and_night_clears_override() {
         },
     );
     assert_eq!(d.target(None), "pyjama");
-    let (d2, _ctx) = make(&dir, MakeOpts { when: dt(9, 15, 2), ..Default::default() });
+    let (d2, _ctx) = make(
+        &dir,
+        MakeOpts {
+            when: dt(9, 15, 2),
+            ..Default::default()
+        },
+    );
     d2.set_override_raw(Some(json!({"id": "maid", "until": 9e12})));
     assert_eq!(d2.target(None), "pyjama");
     assert!(d2.override_value().is_none());
@@ -534,13 +615,17 @@ fn test_a_change_picks_the_original_or_a_kept_variant_and_reconnect_resends_it()
     let sport = d.vrms("sport");
     assert_eq!(sport[0], "res://characters/Felt_Sport.vrm");
     assert!(sport.len() > 1);
-    assert!(sport[1..]
-        .iter()
-        .all(|v| v.starts_with("res://characters/variants/Felt_Sport__")));
+    assert!(
+        sport[1..]
+            .iter()
+            .all(|v| v.starts_with("res://characters/variants/Felt_Sport__"))
+    );
 
     let worker = Arc::clone(&d);
     let handle = thread::spawn(move || worker.change_to("sport", "quick"));
-    wait_until("overlay send", || !ctx.overlay.sent.lock().unwrap().is_empty());
+    wait_until("overlay send", || {
+        !ctx.overlay.sent.lock().unwrap().is_empty()
+    });
     let sent_vrm = ctx.overlay.sent.lock().unwrap()[0]["outfit"]["vrm"]
         .as_str()
         .expect("sent vrm")

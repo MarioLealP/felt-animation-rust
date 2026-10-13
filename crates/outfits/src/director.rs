@@ -11,16 +11,16 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use crate::datetime::DateTime;
 use crate::rng::OutfitRng;
-use crate::state::{OutfitState, HIDDEN, VISIBLE};
+use crate::state::{HIDDEN, OutfitState, VISIBLE};
 use crate::wardrobe::WardrobeStore;
 use crate::{
-    ambient_pick, bikini_roll, effective_date, pick_daily, pool_ids, scheduled_outfit, Outfit,
-    APPLY_TIMEOUT_S, DEFAULT_ID, FREE_WAIT_S, OVERRIDE_SECONDS, PRESENCE_WAIT_S, QUICK_SWAP_DELAY_S,
-    SLEEPY_ENERGY,
+    APPLY_TIMEOUT_S, DEFAULT_ID, FREE_WAIT_S, OVERRIDE_SECONDS, Outfit, PRESENCE_WAIT_S,
+    QUICK_SWAP_DELAY_S, SLEEPY_ENERGY, ambient_pick, bikini_roll, effective_date, pick_daily,
+    pool_ids, scheduled_outfit,
 };
 
 /// Injected time and randomness (Python takes these as constructor args).
@@ -457,7 +457,11 @@ impl OutfitDirector {
             vrms[rng.choice_index(vrms.len())].clone()
         };
         let result = (|| {
-            if !self.state.overlay.send(&self.message(outfit_id, fx, Some(vrm.clone()))) {
+            if !self
+                .state
+                .overlay
+                .send(&self.message(outfit_id, fx, Some(vrm.clone())))
+            {
                 return false;
             }
             self.set_current(outfit_id);

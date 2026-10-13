@@ -35,14 +35,7 @@ pub struct DateTime {
 }
 
 impl DateTime {
-    pub const fn new(
-        year: i32,
-        month: u32,
-        day: u32,
-        hour: u32,
-        minute: u32,
-        second: u32,
-    ) -> Self {
+    pub const fn new(year: i32, month: u32, day: u32, hour: u32, minute: u32, second: u32) -> Self {
         Self {
             year,
             month,

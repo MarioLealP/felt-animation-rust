@@ -91,6 +91,9 @@ pub struct OutfitState {
 impl OutfitState {
     /// `s.seated_on_ledge is None`
     pub fn seated_on_ledge(&self) -> Option<String> {
-        self.seated_on_ledge.lock().unwrap_or_else(|e| e.into_inner()).clone()
+        self.seated_on_ledge
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .clone()
     }
 }

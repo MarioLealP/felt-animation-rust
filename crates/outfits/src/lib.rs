@@ -172,9 +172,7 @@ pub fn ambient_pick(daily: &[String], themed: &[String], rng: &mut dyn OutfitRng
 
 /// A reply tag from a sunny weather answer.
 pub fn is_sunny_weather_tag(tag: Option<&str>) -> bool {
-    tag.is_some_and(|t| {
-        !t.is_empty() && t.starts_with("reaction/weather/") && t.contains("sun")
-    })
+    tag.is_some_and(|t| !t.is_empty() && t.starts_with("reaction/weather/") && t.contains("sun"))
 }
 
 /// The 1%-style bikini roll on a sunny weather answer.
