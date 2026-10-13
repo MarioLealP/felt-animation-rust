@@ -60,5 +60,5 @@ pub const SOURCES_REFRESH_S: f64 = 10.0 * 60.0;
 /// The shipped games.toml (the felt-animation tree's own file - read,
 /// never copied).
 pub fn default_games_path() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../ref/felt-animation/games.toml")
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../data/games.toml")
 }

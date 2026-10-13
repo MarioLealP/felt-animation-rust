@@ -30,8 +30,7 @@ fn dt(m: u32, d: u32, h: u32) -> DateTime {
 }
 
 fn catalogue() -> Vec<felt_outfits::Outfit> {
-    let root =
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../ref/felt-animation/outfits.json");
+    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../data/outfits.json");
     load_outfits(&root)
 }
 

@@ -30,10 +30,10 @@ const REGION_PREFIXES: &[(&str, &str)] = &[
 
 /// `DEFAULT_FACE_POSES_PATH` from the Python module (`face_poses.json` at the
 /// felt-animation source-tree root). The data file is not copied into this
-/// crate, so the default resolves to `ref/felt-animation/face_poses.json` in
+/// crate, so the default resolves to `data/face_poses.json` in
 /// the workspace instead.
 pub fn default_face_poses_path() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("../../ref/felt-animation/face_poses.json")
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("../../data/face_poses.json")
 }
 
 /// Region for a VRoid shape name (`"Fcl_BRW_Angry"` -> `"brows"`), or [`None`]

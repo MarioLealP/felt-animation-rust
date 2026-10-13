@@ -22,8 +22,7 @@ fn py_truthy(value: Option<&Value>) -> bool {
 
 #[test]
 fn test_the_contract_events_speak_and_others_do_not() {
-    let path =
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../ref/felt-animation/reactions.json");
+    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../data/reactions.json");
     let table = load_reactions(&path);
     for event in [
         "game_start",

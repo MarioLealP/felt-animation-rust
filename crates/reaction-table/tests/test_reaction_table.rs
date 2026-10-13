@@ -55,7 +55,7 @@ fn shipped_reactions_path() -> PathBuf {
     // The Python default is module-relative (reactions.json at the
     // felt-animation project root); here the shipped data stays in the
     // read-only reference checkout and is never copied.
-    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../ref/felt-animation/reactions.json")
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../data/reactions.json")
 }
 
 #[test]
