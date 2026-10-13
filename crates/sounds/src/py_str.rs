@@ -85,7 +85,11 @@ fn py_float_str(x: f64) -> String {
     let negative = x.is_sign_negative();
     let abs = x.abs();
     if abs == 0.0 {
-        return if negative { "-0.0".to_owned() } else { "0.0".to_owned() };
+        return if negative {
+            "-0.0".to_owned()
+        } else {
+            "0.0".to_owned()
+        };
     }
     // Rust's `{:e}` yields the shortest round-trip digits as `d.ddde<exp>`,
     // which matches the digits/exponent pair CPython's repr works from.
@@ -102,11 +106,19 @@ fn py_float_str(x: f64) -> String {
             out.push('.');
             out.push_str(rest);
         }
-        out.push_str(&format!("e{}{:02}", if exponent < 0 { '-' } else { '+' }, exponent.abs()));
+        out.push_str(&format!(
+            "e{}{:02}",
+            if exponent < 0 { '-' } else { '+' },
+            exponent.abs()
+        ));
         out
     } else if exponent < 0 {
         // Fixed form below 1: `0.0001`.
-        format!("{sign}0.{}{}", "0".repeat(exponent.unsigned_abs() as usize - 1), digits)
+        format!(
+            "{sign}0.{}{}",
+            "0".repeat(exponent.unsigned_abs() as usize - 1),
+            digits
+        )
     } else {
         let point = exponent as usize + 1;
         if point >= digits.len() {

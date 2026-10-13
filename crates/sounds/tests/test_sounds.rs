@@ -7,7 +7,7 @@ use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use felt_sounds::{
-    SoundKind, SoundMap, SeededRng, load_sound_map, pick_filler_path, pick_kind_sound,
+    SeededRng, SoundKind, SoundMap, load_sound_map, pick_filler_path, pick_kind_sound,
     pick_presence_path, pick_sound_path,
 };
 
@@ -50,7 +50,10 @@ fn test_load_sound_map_missing_file_uses_the_default_table() {
     let tmp = TmpDir::new();
     let result = load_sound_map(&tmp.path().join("does_not_exist.json"));
     assert_eq!(result["sleepy/yawn"], SoundKind::from("yawn"));
-    assert_eq!(result["emotion/laughing"], SoundKind::from(["laugh", "giggle"]));
+    assert_eq!(
+        result["emotion/laughing"],
+        SoundKind::from(["laugh", "giggle"])
+    );
 }
 
 #[test]
@@ -110,10 +113,7 @@ fn test_pick_sound_path_only_considers_wav_files() {
     std::fs::write(kind_dir.join("notes.txt"), b"not audio").expect("write file");
     let result = pick_sound_path("yawn", tmp.path(), None, None);
     assert!(result.is_some());
-    assert_eq!(
-        must(result).file_name().expect("file name"),
-        "take1.wav"
-    );
+    assert_eq!(must(result).file_name().expect("file name"), "take1.wav");
 }
 
 #[test]
@@ -214,11 +214,15 @@ fn test_pick_presence_path_matches_the_line_prefix() {
     }
     let backs: HashSet<String> = (0..20)
         .map(|s| {
-            must(pick_presence_path("back", tmp.path(), Some(&SeededRng::new(s))))
-                .file_name()
-                .expect("file name")
-                .to_string_lossy()
-                .into_owned()
+            must(pick_presence_path(
+                "back",
+                tmp.path(),
+                Some(&SeededRng::new(s)),
+            ))
+            .file_name()
+            .expect("file name")
+            .to_string_lossy()
+            .into_owned()
         })
         .collect();
     assert_eq!(

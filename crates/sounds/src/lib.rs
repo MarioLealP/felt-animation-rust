@@ -148,7 +148,10 @@ pub fn default_tag_to_kind() -> SoundMap {
             "emotion/laughing".to_owned(),
             SoundKind::Many(vec!["laugh".to_owned(), "giggle".to_owned()]),
         ),
-        ("emotion/sighing".to_owned(), SoundKind::One("sigh".to_owned())),
+        (
+            "emotion/sighing".to_owned(),
+            SoundKind::One("sigh".to_owned()),
+        ),
         ("air/land_hard".to_owned(), SoundKind::One("ugh".to_owned())),
         (
             "emotion/surprised".to_owned(),
@@ -166,7 +169,9 @@ pub fn default_tag_to_kind() -> SoundMap {
 /// levels above the package (`src/felt_animation/sounds.py`) - so the default
 /// here is the workspace root two levels above this crate.
 pub fn default_sounds_map_path() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("../..").join("sounds.json")
+    Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../..")
+        .join("sounds.json")
 }
 
 /// tag -> sound kind, or a list of kinds to pick between at random.
@@ -291,9 +296,10 @@ pub fn pick_filler_path(sounds_dir: &Path, rng: Option<&dyn RandomLike>) -> Opti
     }
     let candidates = wav_files(&kind_dir, |name| {
         // name starts with `line + "_"` without a per-line String alloc.
-        !PRESENCE_LINES
-            .iter()
-            .any(|line| name.strip_prefix(*line).is_some_and(|rest| rest.starts_with('_')))
+        !PRESENCE_LINES.iter().any(|line| {
+            name.strip_prefix(*line)
+                .is_some_and(|rest| rest.starts_with('_'))
+        })
     });
     if candidates.is_empty() {
         return None;
@@ -312,9 +318,9 @@ fn wav_files(dir: &Path, accept: impl Fn(&str) -> bool) -> Vec<PathBuf> {
         .map(|entry| entry.path())
         .filter(|path| {
             path.is_file()
-                && path.extension().is_some_and(|ext| {
-                    ext.to_string_lossy().eq_ignore_ascii_case("wav")
-                })
+                && path
+                    .extension()
+                    .is_some_and(|ext| ext.to_string_lossy().eq_ignore_ascii_case("wav"))
                 && path
                     .file_name()
                     .is_some_and(|name| accept(&name.to_string_lossy()))
