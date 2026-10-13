@@ -61,20 +61,12 @@ pub trait DisplayMetrics {
 /// Python's `max(a, b)` for floats: returns `a` unless `b > a` (so a NaN
 /// argument propagates, unlike `f64::max`).
 fn py_max(a: f64, b: f64) -> f64 {
-    if b > a {
-        b
-    } else {
-        a
-    }
+    if b > a { b } else { a }
 }
 
 /// Python's `min(a, b)` for floats: returns `a` unless `b < a`.
 fn py_min(a: f64, b: f64) -> f64 {
-    if b < a {
-        b
-    } else {
-        a
-    }
+    if b < a { b } else { a }
 }
 
 /// Python's `float()` on a JSON value: numbers convert, `true`/`false` become
@@ -96,9 +88,11 @@ fn py_int(value: &Value) -> Option<i64> {
     match value {
         Value::Null => None,
         Value::Bool(b) => Some(i64::from(*b)),
-        Value::Number(n) => n
-            .as_i64()
-            .or_else(|| n.as_f64().filter(|f| f.is_finite()).map(|f| f.trunc() as i64)),
+        Value::Number(n) => n.as_i64().or_else(|| {
+            n.as_f64()
+                .filter(|f| f.is_finite())
+                .map(|f| f.trunc() as i64)
+        }),
         Value::String(s) => s.trim().parse().ok(),
         _ => None,
     }
@@ -300,7 +294,9 @@ impl OverlayGeometry {
                 (px - (f64::from(v.x) + f64::from(v.w))).abs(),
             )
         };
-        self.views.iter().min_by(|a, b| edge_dist(a).total_cmp(&edge_dist(b)))
+        self.views
+            .iter()
+            .min_by(|a, b| edge_dist(a).total_cmp(&edge_dist(b)))
     }
 
     /// `(lo, hi)` world x of one monitor's floor, clamped to the roam range.
@@ -515,7 +511,8 @@ pub fn from_overlay_report(report: &Value, fallback: OverlayGeometry) -> Overlay
     let Some(roam) = report_float(obj, "roam_x_limit", fallback.roam_limit) else {
         return fallback;
     };
-    let Some(char_width) = report_float(obj, "character_width", fallback.character_half_width * 2.0)
+    let Some(char_width) =
+        report_float(obj, "character_width", fallback.character_half_width * 2.0)
     else {
         return fallback;
     };
