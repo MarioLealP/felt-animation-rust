@@ -8,7 +8,7 @@ use std::rc::Rc;
 use std::time::{Duration, Instant};
 
 use crate::exec::{self, AsyncEvent, AsyncLock, JoinHandle, LockGuard};
-use crate::overlay::{layer_for, OverlayLike, LAYER_UPPER};
+use crate::overlay::{LAYER_UPPER, OverlayLike, layer_for};
 
 // A thinking/listening iteration shorter than this means no clip actually
 // played (see the loop in begin_thinking).
@@ -245,11 +245,9 @@ impl<O: OverlayLike + 'static> BehaviorState<O> {
                     // connected, or the tag has no clips) - pace the loop
                     // instead of spinning, while still stopping the moment
                     // end_thinking_and_wait() asks.
-                    let _ = exec::wait_for(
-                        stop.wait(),
-                        Duration::from_secs_f64(IDLE_THINKING_RETRY_S),
-                    )
-                    .await;
+                    let _ =
+                        exec::wait_for(stop.wait(), Duration::from_secs_f64(IDLE_THINKING_RETRY_S))
+                            .await;
                 }
             }
         });
@@ -334,9 +332,7 @@ impl<O: OverlayLike + 'static> BehaviorState<O> {
             overlay.wait_for_arrived(clip_timeout).await;
         }));
         exec::yield_now().await; // let the waiter register before the move is sent
-        self.overlay
-            .move_to(target_x, offscreen, running)
-            .await;
+        self.overlay.move_to(target_x, offscreen, running).await;
         if let Some(cycle) = cycle_tag {
             self.overlay.play_tag(cycle, true).await;
         }

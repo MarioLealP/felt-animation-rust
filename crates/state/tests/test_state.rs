@@ -249,9 +249,7 @@ fn test_walk_to_passes_the_running_flag_to_move() {
         let state = BehaviorState::new(Rc::clone(&overlay), Rc::new(MonotonicClock::new()));
         overlay.fire_arrived();
 
-        state
-            .walk_to(1.0, None, true, None, None, false, 1.0)
-            .await;
+        state.walk_to(1.0, None, true, None, None, false, 1.0).await;
 
         assert!(overlay.moves.borrow()[0].running);
     });

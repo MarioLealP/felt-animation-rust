@@ -15,7 +15,7 @@
 
 use std::cell::RefCell;
 use std::collections::{HashMap, VecDeque};
-use std::future::{poll_fn, Future};
+use std::future::{Future, poll_fn};
 use std::pin::Pin;
 use std::sync::{Arc, Mutex};
 use std::task::{Context, Poll, Wake, Waker};

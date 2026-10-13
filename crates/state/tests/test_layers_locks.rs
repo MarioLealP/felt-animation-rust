@@ -8,13 +8,16 @@ use std::collections::HashMap;
 use std::rc::Rc;
 
 use felt_state::exec::{self, AsyncEvent};
-use felt_state::{layer_for, BehaviorState, MonotonicClock, OverlayLike};
+use felt_state::{BehaviorState, MonotonicClock, OverlayLike, layer_for};
 
 fn layers() -> HashMap<String, String> {
     HashMap::from([
         ("idle".to_string(), "base".to_string()),
         ("idle/sitting".to_string(), "base".to_string()),
-        ("locomotion/walk/normal_walk".to_string(), "base".to_string()),
+        (
+            "locomotion/walk/normal_walk".to_string(),
+            "base".to_string(),
+        ),
         ("gesture/wave".to_string(), "upper".to_string()),
         ("gesture/thinking".to_string(), "upper".to_string()),
         ("emotion/happy".to_string(), "upper".to_string()),
@@ -113,8 +116,16 @@ fn test_wave_plays_while_walking() {
         ));
         let s = Rc::clone(&state);
         let walk = exec::spawn(async move {
-            s.walk_to(1.0, Some("locomotion/walk/normal_walk"), false, None, None, false, 5.0)
-                .await
+            s.walk_to(
+                1.0,
+                Some("locomotion/walk/normal_walk"),
+                false,
+                None,
+                None,
+                false,
+                5.0,
+            )
+            .await
         });
         settle().await;
         assert!(state.base_busy() && !state.upper_busy());
@@ -123,7 +134,12 @@ fn test_wave_plays_while_walking() {
         let wave = exec::spawn(async move { s.run_sequence(&["gesture/wave"], 5.0, None).await });
         settle().await;
         // started mid-walk, not queued
-        assert!(overlay.started.borrow().contains(&"gesture/wave".to_string()));
+        assert!(
+            overlay
+                .started
+                .borrow()
+                .contains(&"gesture/wave".to_string())
+        );
         assert!(!walk.done());
 
         overlay.release("gesture/wave");
@@ -144,8 +160,16 @@ fn test_full_body_tag_waits_for_the_walk() {
         ));
         let s = Rc::clone(&state);
         let walk = exec::spawn(async move {
-            s.walk_to(1.0, Some("locomotion/walk/normal_walk"), false, None, None, false, 5.0)
-                .await
+            s.walk_to(
+                1.0,
+                Some("locomotion/walk/normal_walk"),
+                false,
+                None,
+                None,
+                false,
+                5.0,
+            )
+            .await
         });
         settle().await;
 
@@ -155,10 +179,12 @@ fn test_full_body_tag_waits_for_the_walk() {
                 .await
         });
         settle().await;
-        assert!(!overlay
-            .started
-            .borrow()
-            .contains(&"reaction/turn_surprised".to_string()));
+        assert!(
+            !overlay
+                .started
+                .borrow()
+                .contains(&"reaction/turn_surprised".to_string())
+        );
 
         overlay.arrived.set();
         let _ = walk.join().await;
@@ -191,7 +217,10 @@ fn test_full_body_tag_waits_for_a_gesture_and_blocks_the_next_walk() {
                 .await
         });
         settle().await;
-        assert_eq!(*overlay.started.borrow(), ["gesture/wave"].map(String::from));
+        assert_eq!(
+            *overlay.started.borrow(),
+            ["gesture/wave"].map(String::from)
+        );
         assert!(state.base_busy());
 
         overlay.release("gesture/wave");
@@ -220,7 +249,10 @@ fn test_upper_tags_still_queue_behind_each_other() {
         let s = Rc::clone(&state);
         let happy = exec::spawn(async move { s.run_sequence(&["emotion/happy"], 5.0, None).await });
         settle().await;
-        assert_eq!(*overlay.started.borrow(), ["gesture/wave"].map(String::from));
+        assert_eq!(
+            *overlay.started.borrow(),
+            ["gesture/wave"].map(String::from)
+        );
         overlay.release("gesture/wave");
         let _ = wave.join().await;
         settle().await;
@@ -264,17 +296,27 @@ fn test_thinking_loop_runs_during_a_walk() {
         ));
         let s = Rc::clone(&state);
         let walk = exec::spawn(async move {
-            s.walk_to(1.0, Some("locomotion/walk/normal_walk"), false, None, None, false, 5.0)
-                .await
+            s.walk_to(
+                1.0,
+                Some("locomotion/walk/normal_walk"),
+                false,
+                None,
+                None,
+                false,
+                5.0,
+            )
+            .await
         });
         settle().await;
 
         state.begin_thinking("gesture/thinking", 5.0);
         settle().await;
-        assert!(overlay
-            .started
-            .borrow()
-            .contains(&"gesture/thinking".to_string()));
+        assert!(
+            overlay
+                .started
+                .borrow()
+                .contains(&"gesture/thinking".to_string())
+        );
         assert!(state.upper_busy());
 
         let s = Rc::clone(&state);
@@ -302,15 +344,28 @@ fn test_without_a_layer_report_everything_shares_one_lock() {
         ));
         let s = Rc::clone(&state);
         let walk = exec::spawn(async move {
-            s.walk_to(1.0, Some("locomotion/walk/normal_walk"), false, None, None, false, 5.0)
-                .await
+            s.walk_to(
+                1.0,
+                Some("locomotion/walk/normal_walk"),
+                false,
+                None,
+                None,
+                false,
+                5.0,
+            )
+            .await
         });
         settle().await;
         let s = Rc::clone(&state);
         let wave = exec::spawn(async move { s.run_sequence(&["gesture/wave"], 5.0, None).await });
         settle().await;
         // waits for the walk, as before WP-20
-        assert!(!overlay.started.borrow().contains(&"gesture/wave".to_string()));
+        assert!(
+            !overlay
+                .started
+                .borrow()
+                .contains(&"gesture/wave".to_string())
+        );
         overlay.arrived.set();
         let _ = walk.join().await;
         settle().await;

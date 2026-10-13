@@ -30,5 +30,5 @@ pub mod exec;
 pub mod overlay;
 mod state;
 
-pub use overlay::{layer_for, OverlayLike, LAYER_BASE, LAYER_FULL, LAYER_UPPER};
-pub use state::{layer_of, BehaviorState, Clock, MonotonicClock};
+pub use overlay::{LAYER_BASE, LAYER_FULL, LAYER_UPPER, OverlayLike, layer_for};
+pub use state::{BehaviorState, Clock, MonotonicClock, layer_of};
