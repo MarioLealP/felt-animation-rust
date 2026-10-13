@@ -183,11 +183,7 @@ pub fn resting_face_for_mood(mood: &ShapeWeights) -> ShapeWeights {
         );
         face.insert("Fcl_MTH_Down".to_string(), 0.1);
     } else if happiness < 0.3 {
-        let sorrow = face
-            .get("Fcl_BRW_Sorrow")
-            .copied()
-            .unwrap_or(0.0)
-            .max(0.2);
+        let sorrow = face.get("Fcl_BRW_Sorrow").copied().unwrap_or(0.0).max(0.2);
         face.insert("Fcl_BRW_Sorrow".to_string(), sorrow);
         face.insert("Fcl_MTH_Down".to_string(), 0.1);
     } else if happiness >= 0.55 {

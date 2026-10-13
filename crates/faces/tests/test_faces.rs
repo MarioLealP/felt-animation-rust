@@ -94,7 +94,10 @@ fn test_load_face_poses_real_values_round_trip() {
     fs::write(&path, r#"{"grin": {"Fcl_EYE_Joy": 0.8}}"#).expect("write poses file");
     assert_eq!(
         load_face_poses(&path),
-        HashMap::from([("grin".to_string(), HashMap::from([("Fcl_EYE_Joy".to_string(), 0.8)]))])
+        HashMap::from([(
+            "grin".to_string(),
+            HashMap::from([("Fcl_EYE_Joy".to_string(), 0.8)])
+        )])
     );
     let _ = fs::remove_dir_all(&dir);
 }
@@ -151,7 +154,10 @@ fn test_pose_to_regions_empty_pose() {
 
 #[test]
 fn test_emotion_wins_over_tag() {
-    assert_eq!(pose_for_reaction(Some("happy"), "reaction/failure"), "soft_smile");
+    assert_eq!(
+        pose_for_reaction(Some("happy"), "reaction/failure"),
+        "soft_smile"
+    );
 }
 
 #[test]
