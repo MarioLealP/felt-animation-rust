@@ -17,6 +17,17 @@ pub trait OutfitRng: Send {
     fn choice_index(&mut self, len: usize) -> usize;
 }
 
+/// Forwarding impl so a boxed rng (the director's `Mutex<Box<dyn OutfitRng>>`)
+/// can be passed wherever a `&mut dyn OutfitRng` is wanted.
+impl<R: OutfitRng + ?Sized> OutfitRng for Box<R> {
+    fn random(&mut self) -> f64 {
+        (**self).random()
+    }
+    fn choice_index(&mut self, len: usize) -> usize {
+        (**self).choice_index(len)
+    }
+}
+
 /// CPython's Mersenne Twister (`_random.Random`), seeded the way
 /// `random.Random(seed)` does for small integer seeds.
 pub struct PyRandom {
@@ -49,7 +60,7 @@ impl PyRandom {
         mt[0] = seed;
         for i in 1..N {
             let prev = mt[i - 1];
-            mt[i] = 18_124_33_253u32
+            mt[i] = 1_812_433_253u32
                 .wrapping_mul(prev ^ (prev >> 30))
                 .wrapping_add(i as u32);
         }
