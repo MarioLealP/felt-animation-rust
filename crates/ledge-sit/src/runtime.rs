@@ -54,7 +54,7 @@ impl AppState {
             mood,
             config,
             clock,
-            rng,
+            rng: rng.into(),
             event_sink,
             seated_on_ledge: RefCell::new(None),
             ledge_sit_task: RefCell::new(None),

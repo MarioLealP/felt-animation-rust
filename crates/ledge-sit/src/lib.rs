@@ -109,7 +109,7 @@ pub async fn sit_on_ledge(state: &Rc<AppState>, platform: &Platform) -> bool {
 async fn sit_then_stand(state: Rc<AppState>) {
     let secs = {
         let mut rng = state.rng.borrow_mut();
-        sit_duration_s(&state.mood, &mut *rng)
+        sit_duration_s(&state.mood, &mut **rng)
     };
     state.clock.sleep(secs).await;
     stand_up_from_ledge(&state).await;
