@@ -147,10 +147,10 @@ impl<F: FnMut() -> f64> CallJoinGuessTracker<F> {
         }
 
         let mut fires = false;
-        if !self.was_talking {
-            if let Some(silence_started_at) = self.silence_started_at {
-                fires = (now - silence_started_at) >= self.silence_threshold_s;
-            }
+        if !self.was_talking
+            && let Some(silence_started_at) = self.silence_started_at
+        {
+            fires = (now - silence_started_at) >= self.silence_threshold_s;
         }
         self.was_talking = true;
         fires
