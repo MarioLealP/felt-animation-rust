@@ -72,11 +72,7 @@ fn py_round(x: f64) -> i64 {
     if x - floor == 0.5 {
         let f = floor as i64;
         // A tie lands on the even neighbour.
-        if f % 2 == 0 {
-            f
-        } else {
-            f + 1
-        }
+        if f % 2 == 0 { f } else { f + 1 }
     } else {
         x.round() as i64
     }

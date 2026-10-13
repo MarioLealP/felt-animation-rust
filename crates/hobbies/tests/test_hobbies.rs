@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 
 use felt_hobbies::{
-    hobby_weights, nap_face, pick, HobbyDirector, HobbyEntry, HobbyState, ManualClock, Rng, VISIBLE,
+    HobbyDirector, HobbyEntry, HobbyState, ManualClock, Rng, VISIBLE, hobby_weights, nap_face, pick,
 };
 
 /// Deterministic stand-in for `random.Random(0)`: every draw is the low end.
@@ -153,10 +153,22 @@ fn test_reading_then_stop_cleans_up_and_reports() {
     assert!(!d.active());
     let log = &d.state().log;
     assert_eq!(log[log.len() - 2..].to_vec(), ["dismiss:p1", "stand"]);
-    assert_eq!(done, [HobbyEntry { hobby: "reading".to_string(), minutes: 2 }]);
+    assert_eq!(
+        done,
+        [HobbyEntry {
+            hobby: "reading".to_string(),
+            minutes: 2
+        }]
+    );
     assert_eq!(
         d.state().reported,
-        [("hobby".to_string(), HobbyEntry { hobby: "reading".to_string(), minutes: 2 })]
+        [(
+            "hobby".to_string(),
+            HobbyEntry {
+                hobby: "reading".to_string(),
+                minutes: 2
+            }
+        )]
     );
 }
 
