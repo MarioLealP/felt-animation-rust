@@ -26,7 +26,7 @@ use std::fs;
 use std::path::PathBuf;
 
 use serde::Serialize;
-use serde_json::{json, Map, Value};
+use serde_json::{Map, Value, json};
 
 /// The shirt garment's material slot on the overlay model — the target of
 /// [`apply_tee`]'s texture swap.
@@ -151,10 +151,12 @@ pub fn save_wardrobe_state(config: &WardrobeConfig, state: &Value) -> Result<(),
         &mut buf,
         serde_json::ser::PrettyFormatter::with_indent(b"    "),
     );
-    state.serialize(&mut serializer).map_err(|source| Error::Json {
-        path: config.wardrobe_json_path.clone(),
-        source,
-    })?;
+    state
+        .serialize(&mut serializer)
+        .map_err(|source| Error::Json {
+            path: config.wardrobe_json_path.clone(),
+            source,
+        })?;
     fs::write(&config.wardrobe_json_path, buf).map_err(|source| Error::Write {
         path: config.wardrobe_json_path.clone(),
         source,
@@ -178,7 +180,10 @@ pub fn check_and_roll_daily(
     }
     Ok((
         false,
-        state.get("current_tee").and_then(Value::as_str).map(|s| s.to_owned()),
+        state
+            .get("current_tee")
+            .and_then(Value::as_str)
+            .map(|s| s.to_owned()),
     ))
 }
 
@@ -238,13 +243,18 @@ pub fn roll_tee(
 
     let state_obj = state.as_object_mut().ok_or(Error::StateNotAnObject)?;
     state_obj.insert("current_tee".to_owned(), Value::String(chosen.clone()));
-    state_obj.insert("last_worn_date".to_owned(), Value::String(today_str.clone()));
+    state_obj.insert(
+        "last_worn_date".to_owned(),
+        Value::String(today_str.clone()),
+    );
     // Python: `if "history" not in state: state["history"] = {}`, then
     // `state["history"][chosen] = today_str`.
     let history_obj = state_obj
         .entry("history".to_owned())
         .or_insert_with(|| Value::Object(Map::new()));
-    let history_obj = history_obj.as_object_mut().ok_or(Error::HistoryNotAnObject)?;
+    let history_obj = history_obj
+        .as_object_mut()
+        .ok_or(Error::HistoryNotAnObject)?;
     history_obj.insert(chosen.clone(), Value::String(today_str));
 
     save_wardrobe_state(config, &state)?;

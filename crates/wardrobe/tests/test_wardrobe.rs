@@ -16,10 +16,10 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use felt_wardrobe::{
-    apply_tee, check_and_roll_daily, load_approved_tees, load_wardrobe_state, roll_tee, Date,
-    Days, Error, Overlay, WardrobeConfig,
+    Date, Days, Error, Overlay, WardrobeConfig, apply_tee, check_and_roll_daily,
+    load_approved_tees, load_wardrobe_state, roll_tee,
 };
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 /// The Python tests roll against `datetime.date.today()`; the clock is
 /// injected, so a fixed date stands in.
@@ -43,10 +43,8 @@ struct TmpPath {
 
 impl TmpPath {
     fn new(test_name: &str) -> TmpPath {
-        let path = std::env::temp_dir().join(format!(
-            "felt-wardrobe-{}-{test_name}",
-            std::process::id()
-        ));
+        let path =
+            std::env::temp_dir().join(format!("felt-wardrobe-{}-{test_name}", std::process::id()));
         let _ = fs::remove_dir_all(&path);
         fs::create_dir_all(&path).expect("create tmp dir");
         TmpPath { path }
@@ -168,10 +166,15 @@ fn test_roll_tee_a_tee_worn_exactly_21_days_ago_is_valid_again() {
     let config = setup(tmp.path(), Some(&["only_shirt"]));
     let today = today();
     let worn_21_days_ago = (today - Days::new(21)).isoformat();
-    write_state(&config, json!({"history": {"only_shirt": worn_21_days_ago}}));
+    write_state(
+        &config,
+        json!({"history": {"only_shirt": worn_21_days_ago}}),
+    );
 
     assert_eq!(
-        roll_tee(&config, today, &mut first_choice).unwrap().as_deref(),
+        roll_tee(&config, today, &mut first_choice)
+            .unwrap()
+            .as_deref(),
         Some("only_shirt")
     );
 }
@@ -190,7 +193,10 @@ fn test_roll_tee_ignores_the_cooldown_when_everything_is_on_cooldown() {
     // Every approved tee is on cooldown - still rolls one rather than going
     // shirtless (roll_tee's own documented fallback).
     let chosen = roll_tee(&config, today, &mut first_choice).unwrap();
-    assert!(matches!(chosen.as_deref(), Some("a_shirt") | Some("b_shirt")));
+    assert!(matches!(
+        chosen.as_deref(),
+        Some("a_shirt") | Some("b_shirt")
+    ));
 }
 
 #[test]
