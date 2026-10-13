@@ -70,7 +70,7 @@ fn tone(seconds: f64, amplitude: i32, samplerate: u32) -> Vec<i16> {
     (0..n)
         .map(|i| {
             let t = i as f64 / f64::from(samplerate);
-            (f64::from(amplitude) * (2.0 * f64::consts::PI * 220.0 * t).sin()) as i16
+            (f64::from(amplitude) * (2.0 * std::f64::consts::PI * 220.0 * t).sin()) as i16
         })
         .collect()
 }
