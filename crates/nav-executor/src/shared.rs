@@ -106,6 +106,9 @@ pub struct ClimbedNotice {
 /// pair and their completion-notice waiters. The real implementation (a
 /// subprocess + TCP relay to main.gd) lives in the overlay module's port;
 /// tests pass a fake, exactly like the Python spec.
+/// Note: `async fn` in this public trait is deliberate - the port is
+/// single-threaded (Rc/RefCell state, no Send bounds needed anywhere).
+#[allow(async_fn_in_trait)]
 pub trait Overlay {
     async fn play_and_wait(&self, tag: &str, timeout: f64, clip: Option<&str>);
     async fn play_tag(&self, tag: &str, looping: bool, clip: Option<&str>);
@@ -280,6 +283,9 @@ impl<O: Overlay> BehaviorState<O> {
 
     /// walk_to without taking the lock - for a caller already holding the
     /// base lock (WP-21 prop sequences / nav_executor's run_plan).
+    // state.py's walk_body has this exact 7-parameter shape; keeping it is
+    // the point of the shared type.
+    #[allow(clippy::too_many_arguments)]
     pub async fn walk_body(
         &self,
         target_x: f64,
@@ -349,15 +355,15 @@ async fn join2<A: Future, B: Future>(a: A, b: B) -> (A::Output, B::Output) {
     let mut a_out = None;
     let mut b_out = None;
     poll_fn(move |cx| {
-        if a_out.is_none() {
-            if let Poll::Ready(out) = a.as_mut().poll(cx) {
-                a_out = Some(out);
-            }
+        if a_out.is_none()
+            && let Poll::Ready(out) = a.as_mut().poll(cx)
+        {
+            a_out = Some(out);
         }
-        if b_out.is_none() {
-            if let Poll::Ready(out) = b.as_mut().poll(cx) {
-                b_out = Some(out);
-            }
+        if b_out.is_none()
+            && let Poll::Ready(out) = b.as_mut().poll(cx)
+        {
+            b_out = Some(out);
         }
         match (a_out.take(), b_out.take()) {
             (Some(av), Some(bv)) => Poll::Ready((av, bv)),
@@ -412,6 +418,9 @@ pub async fn stand_up_if_sitting<O: Overlay, H: StandUpHooks, G: Geometry>(
 /// exchange plus stay-timer cancel) and behavior.sit_to_stand_clips'
 /// props_director stand_up_clip lookup. Injected on [`AppState`]; tests
 /// use [`NoopStandUpHooks`] (the spec never sits).
+/// Note: `async fn` in this public trait is deliberate - same single-
+/// threaded shape as [`Overlay`].
+#[allow(async_fn_in_trait)]
 pub trait StandUpHooks {
     /// ledge_sit.py's stand_up_from_ledge, minus the seated_on_ledge
     /// clear (the caller does that first, like the Python does).
