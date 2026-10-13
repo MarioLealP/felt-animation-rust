@@ -9,8 +9,8 @@
 //!
 //! Priority, highest first:
 //!   1. off     - a tag on the per-tag opt-out list is playing (clips where
-//!                additive head tracking would fight the clip's own head/body
-//!                motion: falls, climbs, get-ups, nods, dances ...)
+//!      additive head tracking would fight the clip's own head/body
+//!      motion: falls, climbs, get-ups, nods, dances ...)
 //!   2. camera  - she is speaking (reply playback start -> end)
 //!   3. point   - she is thinking (up-left glance)
 //!   4. camera  - the cursor has been still for >= 4 s
