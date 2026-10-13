@@ -227,10 +227,10 @@ pub fn classify_process(
         return false;
     }
     let key = exe_path.map(norm_path);
-    if let Some(key) = &key {
-        if sources.exclude_roots.iter().any(|root| is_under(key, root)) {
-            return false;
-        }
+    if let Some(key) = &key
+        && sources.exclude_roots.iter().any(|root| is_under(key, root))
+    {
+        return false;
     }
     // An explicit game beats the ignore patterns.
     if sources.manual_names.contains(&name) {
