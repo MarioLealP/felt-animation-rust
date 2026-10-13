@@ -11,17 +11,17 @@ use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
 use felt_ledge_sit::behavior::{stand_up_if_sitting, walk_to};
-use felt_ledge_sit::debug::{world_endpoint, WorldState};
-use felt_ledge_sit::exec::{block_on, BoxFuture};
+use felt_ledge_sit::debug::{WorldState, world_endpoint};
+use felt_ledge_sit::exec::{BoxFuture, block_on};
 use felt_ledge_sit::overlay::OverlayClient;
 use felt_ledge_sit::runtime::{AppState, WorldMsg};
 use felt_ledge_sit::shared::{
-    Clock, EventConfig, EventSink, Mood, Overlay, OverlayMsg, Platform, PlatformKind,
-    RandomSource, SitTask,
+    Clock, EventConfig, EventSink, Mood, Overlay, OverlayMsg, Platform, PlatformKind, RandomSource,
+    SitTask,
 };
 use felt_ledge_sit::{
-    maybe_sit_after_arrival, sit_chance, sit_duration_s, sit_on_ledge, stand_up_from_ledge,
-    BORED_DURATION_SCALE, SIT_DURATION_MAX_S, SIT_DURATION_MIN_S,
+    BORED_DURATION_SCALE, SIT_DURATION_MAX_S, SIT_DURATION_MIN_S, maybe_sit_after_arrival,
+    sit_chance, sit_duration_s, sit_on_ledge, stand_up_from_ledge,
 };
 
 fn ledge() -> Platform {
@@ -148,11 +148,7 @@ struct AlternatingRng {
 impl RandomSource for AlternatingRng {
     fn next_unit(&mut self) -> f64 {
         self.flip = !self.flip;
-        if self.flip {
-            1.0
-        } else {
-            0.0
-        }
+        if self.flip { 1.0 } else { 0.0 }
     }
 }
 
@@ -221,7 +217,12 @@ fn make_state(
 /// `_make_state` with the default test injectables: a stay timer that
 /// never fires and a mid-range duration draw.
 fn quiet_state(overlay: Rc<FakeOverlay>, mood: Mood) -> Rc<AppState> {
-    make_state(overlay, mood, Rc::new(NeverSleeper), Box::new(FixedRng(0.5)))
+    make_state(
+        overlay,
+        mood,
+        Rc::new(NeverSleeper),
+        Box::new(FixedRng(0.5)),
+    )
 }
 
 // -- sit_chance / sit_duration_s (pure) ---------------------------------------
@@ -292,10 +293,12 @@ fn test_explicit_ledge_action_always_sits_regardless_of_chance() {
         let sat = maybe_sit_after_arrival(&state, &ledge(), &neutral_mood(), true).await;
         assert!(sat);
         assert_eq!(state.seated_on_ledge.borrow().as_deref(), Some("win:1:0"));
-        assert!(overlay
-            .sent
-            .borrow()
-            .contains(&OverlayMsg::LedgeSit { y_px: 600.0 }));
+        assert!(
+            overlay
+                .sent
+                .borrow()
+                .contains(&OverlayMsg::LedgeSit { y_px: 600.0 })
+        );
         let task = state.ledge_sit_task.borrow().clone().expect("a stay timer");
         task.cancel();
         task.wait().await;
@@ -390,10 +393,7 @@ fn test_seated_timeout_stands_her_up() {
         assert!((SIT_DURATION_MIN_S..=SIT_DURATION_MAX_S).contains(&slept[0]));
         drop(slept);
         assert!(state.seated_on_ledge.borrow().is_none());
-        assert!(overlay
-            .sent
-            .borrow()
-            .contains(&OverlayMsg::LedgeStand));
+        assert!(overlay.sent.borrow().contains(&OverlayMsg::LedgeStand));
     });
 }
 
