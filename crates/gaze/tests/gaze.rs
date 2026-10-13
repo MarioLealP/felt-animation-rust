@@ -73,7 +73,10 @@ fn test_controller_sends_only_on_change_and_follows_the_cursor() {
 
     gaze.observe_cursor(Some((12, 10))); // moved again
     gaze.update();
-    assert_eq!(*sent.borrow(), [GazeMode::Cursor, GazeMode::Camera, GazeMode::Cursor]);
+    assert_eq!(
+        *sent.borrow(),
+        [GazeMode::Cursor, GazeMode::Camera, GazeMode::Cursor]
+    );
 
     gaze.speaking = true;
     gaze.update();
@@ -114,5 +117,8 @@ fn test_failed_send_is_retried_and_resend_repeats_the_current_mode() {
     gaze.update(); // retried because the first send wasn't delivered
     gaze.update(); // now delivered - no repeat
     gaze.resend(); // overlay reconnected
-    assert_eq!(*sent.borrow(), [GazeMode::Cursor, GazeMode::Cursor, GazeMode::Cursor]);
+    assert_eq!(
+        *sent.borrow(),
+        [GazeMode::Cursor, GazeMode::Cursor, GazeMode::Cursor]
+    );
 }

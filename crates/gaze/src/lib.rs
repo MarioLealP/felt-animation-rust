@@ -74,7 +74,10 @@ pub fn is_opted_out(tag: Option<&str>, opt_out: &[&str]) -> bool {
     match tag {
         None | Some("") => false,
         Some(tag) => opt_out.iter().any(|prefix| {
-            tag == *prefix || tag.strip_prefix(*prefix).is_some_and(|rest| rest.starts_with('/'))
+            tag == *prefix
+                || tag
+                    .strip_prefix(*prefix)
+                    .is_some_and(|rest| rest.starts_with('/'))
         }),
     }
 }
@@ -91,7 +94,11 @@ pub fn decide_gaze(
     } else if speaking {
         (GazeMode::Camera, None, None)
     } else if thinking {
-        (GazeMode::Point, Some(THINKING_POINT.0), Some(THINKING_POINT.1))
+        (
+            GazeMode::Point,
+            Some(THINKING_POINT.0),
+            Some(THINKING_POINT.1),
+        )
     } else if cursor_still_s >= CURSOR_STILL_TO_CAMERA_S {
         (GazeMode::Camera, None, None)
     } else {
