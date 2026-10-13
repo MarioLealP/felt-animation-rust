@@ -13,9 +13,10 @@
 //! of felt-animation's presence lines already use - `behavior.play_presence_line`
 //! (a small curated-by-Mario wav pool per line, silently nothing if uncurated)
 //! - plus a no-immediate-repeat pool and a cooldown here, never a fresh
-//! felt-core round trip for a canned line like this.
+//!   felt-core round trip for a canned line like this.
 
 use std::collections::BTreeSet;
+use std::future::Future;
 
 // -- shared types, minimally ported from world.py ----------------------------
 // (world.py is its own module/crate - only the definitions window_events
@@ -93,7 +94,7 @@ pub fn covers_whole_monitor(rect: Rect, monitor: &Monitor) -> bool {
 
 /// The monitor containing (cx, cy), if any. `left`/`top` inclusive,
 /// `right`/`bottom` exclusive - same as world.py.
-pub fn monitor_for_point<'a>(cx: f64, cy: f64, monitors: &'a [Monitor]) -> Option<&'a Monitor> {
+pub fn monitor_for_point(cx: f64, cy: f64, monitors: &[Monitor]) -> Option<&Monitor> {
     monitors
         .iter()
         .find(|m| m.left <= cx && cx < m.right && m.top <= cy && cy < m.bottom)
@@ -150,7 +151,7 @@ pub enum OverlayMessage {
 /// message couldn't be delivered; the caller treats that as "nothing
 /// happened".
 pub trait Overlay {
-    async fn send(&mut self, message: OverlayMessage) -> bool;
+    fn send(&mut self, message: OverlayMessage) -> impl Future<Output = bool> + Send;
 }
 
 /// `state.geometry()` - her px<->world mapping plus pixels-per-meter.
