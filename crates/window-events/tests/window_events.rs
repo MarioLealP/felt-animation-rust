@@ -10,10 +10,10 @@
 use std::collections::BTreeSet;
 
 use felt_window_events::{
-    classify_fall_cause, detect_ride, is_fullscreen_on_monitor, maybe_retreat_from_fullscreen,
-    pick_annoyed_line, pick_retreat_target, react_to_landing, try_ride, Behavior, Clock, Foreground,
-    Geometry, Monitor, Navigator, Overlay, OverlayMessage, Plan, Platform, RandomLike,
-    WINDOW_ANNOYED_LINES, Win, WindowEventState,
+    Behavior, Clock, Foreground, Geometry, Monitor, Navigator, Overlay, OverlayMessage, Plan,
+    Platform, RandomLike, WINDOW_ANNOYED_LINES, Win, WindowEventState, classify_fall_cause,
+    detect_ride, is_fullscreen_on_monitor, maybe_retreat_from_fullscreen, pick_annoyed_line,
+    pick_retreat_target, react_to_landing, try_ride,
 };
 
 // -- tiny executor (test fakes complete immediately, no runtime needed) ------
@@ -146,7 +146,10 @@ fn test_cause_vanished_when_hwnd_is_gone() {
 #[test]
 fn test_cause_maximised_when_hwnd_covers_the_work_area() {
     let maximised = mk_win(1, (0.0, 0.0, 1920.0, 1040.0), "Notepad");
-    assert_eq!(classify_fall_cause(&ledge(), &[maximised], &[mon0()]), "maximised");
+    assert_eq!(
+        classify_fall_cause(&ledge(), &[maximised], &[mon0()]),
+        "maximised"
+    );
 }
 
 #[test]
@@ -407,7 +410,10 @@ fn test_vanished_landing_plays_annoyed_and_a_budgeted_line() {
         &mut behavior,
     ));
 
-    assert_eq!(behavior.played_tags, vec![vec!["emotion/annoyed".to_string()]]);
+    assert_eq!(
+        behavior.played_tags,
+        vec![vec!["emotion/annoyed".to_string()]]
+    );
     assert_eq!(behavior.lines.len(), 1);
     assert!(WINDOW_ANNOYED_LINES.contains(&behavior.lines[0].as_str()));
     assert_eq!(
@@ -431,7 +437,10 @@ fn test_maximised_landing_is_non_verbal_only() {
         &mut behavior,
     ));
 
-    assert_eq!(behavior.played_tags, vec![vec!["emotion/surprised".to_string()]]);
+    assert_eq!(
+        behavior.played_tags,
+        vec![vec!["emotion/surprised".to_string()]]
+    );
     assert!(behavior.lines.is_empty());
 }
 
@@ -511,13 +520,7 @@ fn test_fullscreen_on_her_monitor_relocates_once_per_episode() {
     for _ in 0..3 {
         // simulate 3 consecutive world ticks, still fullscreen
         block_on(maybe_retreat_from_fullscreen(
-            &mut state,
-            &geometry,
-            false,
-            &mut nav,
-            &platforms,
-            &monitors,
-            foreground,
+            &mut state, &geometry, false, &mut nav, &platforms, &monitors, foreground,
         ));
     }
 
@@ -535,13 +538,7 @@ fn test_fullscreen_with_a_single_monitor_does_nothing() {
     let foreground: Option<Foreground> = Some((7, (0.0, 0.0, 1920.0, 1080.0)));
 
     block_on(maybe_retreat_from_fullscreen(
-        &mut state,
-        &geometry,
-        false,
-        &mut nav,
-        &platforms,
-        &monitors,
-        foreground,
+        &mut state, &geometry, false, &mut nav, &platforms, &monitors, foreground,
     ));
 
     assert!(nav.plans_run.is_empty());
@@ -558,12 +555,7 @@ fn test_fullscreen_ending_resets_the_episode_latch() {
     let mut nav = FakeNavigator::default();
 
     block_on(maybe_retreat_from_fullscreen(
-        &mut state,
-        &geometry,
-        false,
-        &mut nav,
-        &platforms,
-        &monitors,
+        &mut state, &geometry, false, &mut nav, &platforms, &monitors,
         None, // no foreground -> not fullscreen anymore
     ));
 

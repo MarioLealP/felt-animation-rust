@@ -501,15 +501,13 @@ pub async fn maybe_retreat_from_fullscreen<G: Geometry, N: Navigator>(
     let Some((floor, corner_x)) = target else {
         return;
     };
-    let ppm = if geometry.ppm() > 0.0 { geometry.ppm() } else { 1.0 };
-    let Some(plan) = nav.plan_route(
-        platforms,
-        ppm,
-        current_id,
-        her_x_px,
-        &floor.id,
-        corner_x,
-    ) else {
+    let ppm = if geometry.ppm() > 0.0 {
+        geometry.ppm()
+    } else {
+        1.0
+    };
+    let Some(plan) = nav.plan_route(platforms, ppm, current_id, her_x_px, &floor.id, corner_x)
+    else {
         return;
     };
     state.fullscreen_retreat_active = true;
