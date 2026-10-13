@@ -161,15 +161,15 @@ fn build_edges(platforms: &[Platform], ppm: f64) -> HashMap<String, Vec<Edge>> {
                     x_px: mid,
                     meters: 0,
                 });
-            } else if drop < -SAME_HEIGHT_TOLERANCE_PX {
-                if let Some(meters) = climb_meters_for_rise(-drop, ppm) {
-                    edges.entry(a.id.clone()).or_default().push(Edge {
-                        kind: EdgeKind::Climb,
-                        to_id: b.id.clone(),
-                        x_px: mid,
-                        meters,
-                    });
-                }
+            } else if drop < -SAME_HEIGHT_TOLERANCE_PX
+                && let Some(meters) = climb_meters_for_rise(-drop, ppm)
+            {
+                edges.entry(a.id.clone()).or_default().push(Edge {
+                    kind: EdgeKind::Climb,
+                    to_id: b.id.clone(),
+                    x_px: mid,
+                    meters,
+                });
             }
         }
     }
