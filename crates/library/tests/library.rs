@@ -70,7 +70,10 @@ fn test_vrma_import_suffix_counts() {
 #[test]
 fn test_missing_dir_returns_empty() {
     let tmp = TempDir::new("missing_dir_returns_empty");
-    assert_eq!(scan_tags(&tmp.path().join("does_not_exist")), HashSet::new());
+    assert_eq!(
+        scan_tags(&tmp.path().join("does_not_exist")),
+        HashSet::new()
+    );
 }
 
 // -- TestResolveKnownTag -----------------------------------------------------
@@ -105,7 +108,10 @@ fn test_several_levels_up() {
 #[test]
 fn test_nothing_matches() {
     let known = tags(&["idle", "emotion/happy"]);
-    assert_eq!(resolve_known_tag(Some("reaction/weather/sun"), &known), None);
+    assert_eq!(
+        resolve_known_tag(Some("reaction/weather/sun"), &known),
+        None
+    );
 }
 
 #[test]
